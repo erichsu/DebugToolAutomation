@@ -6,6 +6,7 @@ import sys
 import argparse
 import os
 import subprocess
+import time
 import ConfigParser
 
 class Automator():
@@ -21,15 +22,27 @@ class Automator():
         print 'TESTCASE_PREFIX = %s' % self.testcase_prefix
         print '\n'
         
-        print 'Scanning TestCase in \n %s' % os.getcwd()
-        test_list = self._get_test_list(os.getcwd())
-        print 'There are %d Cases' % len(test_list)
+        config = ConfigParser.ConfigParser()
+        config.read(os.path.join(os.getcwd(), self.global_config))
+        global_config = dict(config.items('defaults'))
         
-        for test in test_list:
-            name = os.path.basename(test)
-            print '#### %s ####' % name
-            tester = TestCaseHandler(TestCase(name))
+        if self.testcase:
+            name = self.testcase
+            print '### %s ###' % name
+            tester = TestCaseHandler(TestCase(name, global_config))
             tester.run()
+            
+        else:
+            print 'Scanning TestCase in \n %s' % os.getcwd()
+            test_list = self._get_test_list(os.getcwd())
+            print 'There are %d TestCases' % len(test_list)
+            print '\n'
+        
+            for test in test_list:
+                name = os.path.basename(test)
+                print '#### %s ####' % name
+                tester = TestCaseHandler(TestCase(name, global_config))
+                tester.run()
 
     def _get_test_list(self, path_root):
         """ list folders with the name heading of TESTCASE_PREFIX. """
@@ -52,7 +65,7 @@ class TestCaseHandler:
         self._start_debug_mode()
         
         print '@Start test script.'
-        self._trigger_test()
+        # self._trigger_test()
         
         print '@Stop Debug Tool'
         self._stop_debug_mode()
@@ -63,13 +76,24 @@ class TestCaseHandler:
         print '\n'
         
     def _setup_environment(self):
-        """ TODO:
-        1. launch the Emulator
-        2. call the related tool to change the emulator env.
-        """
+        """ TODO: call the related tool to change the emulator env. """
         env = self.test_case.get_env()
-        print env
         
+        ## launch emulator
+        print 'Launch emulator'
+        cmd = '%(emulator)s -avd %(os)s' % env
+        # self.proc_emu = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
+        
+        ## wait for emulator
+        print 'Waiting for emulator...'
+        # time.sleep(5)
+        
+        ## setup env by adb shell
+        print 'Setup date'
+        cmd = '%(adb)s wait-for-device shell date -s 20091212' % env
+        # cmd = '%(adb)s wait-for-device shell am start -n com.android.browser/com.android.browser.BrowserActivity' % env
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
     
     def _start_debug_mode(self):
         """ TODO: send intent message by adb shell command. """
@@ -81,23 +105,25 @@ class TestCaseHandler:
     
     def _trigger_test(self):
         cmd = self.test_case.get_test_script()
-        proc = subprocess.Popen(cmd, cwd=self.test_case.path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        print proc.stdout.read()
+        proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
+        proc.wait()
+        # print self.proc_test.stdout.read()
     
     def _collect_result(self):
-        """ TODO: generate output folder """
+        """ TODO: use adb shell to get result in SD card folder """
+        # self.proc_emu.terminate()
         pass
 
 class TestCase:
-    def __init__(self, name):
+    def __init__(self, name, global_config=None):
         self.name = name
         self.path = os.path.join(os.getcwd(), name)
         self.config_path = os.path.join(self.path, 'config.ini')
-        self.config = ConfigParser.ConfigParser()
+        self.config = ConfigParser.ConfigParser(global_config)
         self.config.read(self.config_path)
     
     def get_env(self):
-        return self.config.items('environment')
+        return dict(self.config.items('environment'))
     
     def get_test_script(self):
         return self.config.get('test script', 'command')
@@ -113,7 +139,9 @@ def main():
     parser = argparse.ArgumentParser(description='Autmation script for Android App testing.')
     parser.add_argument('-v', '--version', action='version', version='Automator 1.0',
                         help='show the version info')
-    parser.add_argument('-c', '--config', action='store', dest='global_config', 
+    parser.add_argument('-r', '--run', action='store', dest='testcase', 
+                        help='assign specific test case')
+    parser.add_argument('-c', '--config', action='store', dest='global_config', default='config.ini', 
                         help='set the config file path')
     parser.add_argument('-p', '--prefix', action='store', dest='testcase_prefix', default='TestCase', 
                         help='set Test Case prefix, (default "TestCase")')
@@ -122,5 +150,5 @@ def main():
     
 
 if __name__ == "__main__":
-    #sys.argv += "-c C:\\testing\\path".split()
+    sys.argv += "-r TestCase0".split()
     main()
