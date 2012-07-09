@@ -65,7 +65,7 @@ class TestCaseHandler:
         self._start_debug_mode()
         
         print '@Start test script.'
-        # self._trigger_test()
+        self._trigger_test()
         
         print '@Stop Debug Tool'
         self._stop_debug_mode()
@@ -82,36 +82,51 @@ class TestCaseHandler:
         ## launch emulator
         print 'Launch emulator'
         cmd = '%(emulator)s -avd %(os)s' % env
-        # self.proc_emu = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
+        self.proc_emu = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
+        time.sleep(1)
         
         ## wait for emulator
         print 'Waiting for emulator...'
-        # time.sleep(5)
+        cmd = '%(adb)s wait-for-device shell input keyevent 82' % env
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
+        time.sleep(1)
         
         ## setup env by adb shell
         print 'Setup date'
         cmd = '%(adb)s wait-for-device shell date -s 20091212' % env
-        # cmd = '%(adb)s wait-for-device shell am start -n com.android.browser/com.android.browser.BrowserActivity' % env
         proc = subprocess.Popen(cmd.split())
+        proc.wait()
+        
+        ## install test apk
+        print 'Install test apk'
+        cmd = '%(adb)s wait-for-device install -r %(apk)s' % env
+        proc = subprocess.Popen(cmd.split(None, 4), cwd=self.test_case.path)
         proc.wait()
     
     def _start_debug_mode(self):
-        """ TODO: send intent message by adb shell command. """
-        pass
+        """ Send STARTPUP_TASK intent to the debug service. """
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STARTUP_TASK' % self.test_case.get_env()
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
     
     def _stop_debug_mode(self):
-        """ TODO: send intent message by adb shell command. """
-        pass
+        """ Send STOP_TASK intent to the debug service. """
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STOP_TASK' % self.test_case.get_env()
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
     
     def _trigger_test(self):
         cmd = self.test_case.get_test_script()
         proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
         proc.wait()
-        # print self.proc_test.stdout.read()
     
     def _collect_result(self):
         """ TODO: use adb shell to get result in SD card folder """
-        # self.proc_emu.terminate()
+        # cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STOP_TASK' % self.test_case.get_env()
+        # proc = subprocess.Popen(cmd.split())
+        # proc.wait()
+        self.proc_emu.terminate()
         pass
 
 class TestCase:
