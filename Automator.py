@@ -87,11 +87,13 @@ class TestCaseHandler:
         
         ## wait for emulator
         print 'Waiting for emulator...'
-        cmd = '%(adb)s wait-for-device shell input keyevent 82' % env
-        proc = subprocess.Popen(cmd.split())
-        proc.wait()
-        time.sleep(1)
-        
+        while True:
+            cmd = '%(adb)s wait-for-device shell getprop init.svc.bootanim' % env
+            proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if 'stopped' in proc.stdout.read():
+                break
+            time.sleep(3)
+                
         ## setup env by adb shell
         print 'Setup date'
         cmd = '%(adb)s wait-for-device shell date -s 20091212' % env
