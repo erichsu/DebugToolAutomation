@@ -115,6 +115,26 @@ class TestCaseHandler:
         cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STOP_TASK' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split())
         proc.wait()
+        
+        """ TODO: make sure service is stopped fully, here use dumpsys command to check infinitely. """
+        max_retry_count = 10
+        retry_count = 0
+        while True:
+            cmd = '%(adb)s shell dumpsys activity service com.trendmicro.tmmssuite.consumer' % self.test_case.get_env()
+            proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+            prepro = proc.communicate();
+            proc.wait()
+            #print prepro[0]
+            retry_count+=1
+            if prepro[0].find('BackendService')>0:
+                print 'continue, since backend still alived'
+            
+            if retry_count >= max_retry_count:
+                print 'it is time to go'
+                break
+            time.sleep(1)
+        print 'end...'
+        
     
     def _trigger_test(self):
         cmd = self.test_case.get_test_script()
