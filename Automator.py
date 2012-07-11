@@ -9,6 +9,8 @@ import subprocess
 import time
 import ConfigParser
 
+from AndroidSetting import AndroidSetting
+
 class Automator():
     """ Main class for automation. """
     """ TODO: add log """
@@ -73,6 +75,12 @@ class TestCaseHandler:
         print '@Collect Data'
         self._collect_result()
         
+        print '@Verify Data'
+        self._verify()
+        
+        print '@Generate Report'
+        self._report()
+        
         print '\n'
         
     def _setup_environment(self):
@@ -82,7 +90,7 @@ class TestCaseHandler:
         ## launch emulator
         print 'Launch emulator'
         cmd = '%(emulator)s -avd %(os)s' % env
-        self.proc_emu = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
+        self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         time.sleep(1)
         
         ## wait for emulator
@@ -95,10 +103,8 @@ class TestCaseHandler:
             time.sleep(3)
                 
         ## setup env by adb shell
-        print 'Setup date'
-        cmd = '%(adb)s wait-for-device shell date -s 20091212' % env
-        proc = subprocess.Popen(cmd.split())
-        proc.wait()
+        print 'Setup environment'
+        AndroidSetting(env).setup()
         
         ## install test apk
         print 'Install test apk'
@@ -108,13 +114,13 @@ class TestCaseHandler:
     
     def _start_debug_mode(self):
         """ Send STARTPUP_TASK intent to the debug service. """
-        cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STARTUP_TASK' % self.test_case.get_env()
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a com.trendmicro.mobile.tool.STARTUP_TASK' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split())
         proc.wait()
     
     def _stop_debug_mode(self):
         """ Send STOP_TASK intent to the debug service. """
-        cmd = '%(adb)s wait-for-device shell am startservice -n %(service)s -a com.trendmicro.mobile.tool.STOP_TASK' % self.test_case.get_env()
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a com.trendmicro.mobile.tool.STOP_TASK' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split())
         proc.wait()
         
@@ -149,6 +155,11 @@ class TestCaseHandler:
         # proc = subprocess.Popen(cmd.split())
         # proc.wait()
         self.proc_emu.terminate()
+        
+    def _verify(self):
+        pass
+        
+    def _report(self):
         pass
 
 class TestCase:

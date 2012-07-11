@@ -4,27 +4,25 @@ This is a subfunction of automation tool for adb command executing
 
 import subprocess
 
-class AdbFun(object):
+class AndroidSetting(object):
     '''
     classdocs
     '''
 
-    def __init__(self, global_config=None):
-        self.global_config = global_config
-        self.support_adb = ['battery', 'wifi', 'osdatetime', 'sms']
+    def __init__(self, config=None):
+        self.config = config
+        self.options = ['battery', 'wifi', 'date', 'sms']
         
-    def _expectedSetting(self):
-        print self.global_config
-        
+    def setup(self):
         #a None value indicates that the process hasn't terminated yet.
         status = None
         
         '''self._unlock_screen()'''
         
-        for key in self.support_adb:
-            if key in self.global_config and self.global_config[key] != '':
+        for key in self.options:
+            if key in self.config and self.config[key] != '':
                 method = getattr(self, '_'+key)
-                status = method(self.global_config[key])
+                status = method(self.config[key])
 
         return status
     
@@ -33,9 +31,11 @@ class AdbFun(object):
         proc = subprocess.Popen(cmd.split())
         return proc.wait()
     
-    def _osdatetime(self, datetime=''):
-        print '_osdatetime'
-        return 0
+    def _date(self, datetime=''):
+        print 'Modify date time'
+        cmd = '%(adb)s wait-for-device shell date -s %(date)s' % self.config
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
     
     def _battery(self, volume='50'):
         print '_battery'
@@ -50,6 +50,6 @@ class AdbFun(object):
         return 0
         
 if __name__ == "__main__":
-    af = AdbFun({'battery':'25', 'wifi':'off', 'osdatetime':''})
-    print 'result code: %s', af._expectedSetting()
+    android_setting = AndroidSetting({'battery':'25', 'wifi':'off', 'date':'20101010', 'adb':'/Users/eric_hsu/Downloads/android-sdk-macosx/platform-tools/adb'})
+    print 'result code: %s', android_setting.setup()
     
