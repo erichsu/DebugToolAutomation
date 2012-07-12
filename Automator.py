@@ -1,6 +1,13 @@
+#!/usr/bin/env python
+# encoding: utf-8
 """
+Automator.py
 This is a Autmation script for Android App testing.
+
+Created by Eric Hsu (RD-TW) on 2012-07-11.
+Copyright (c) 2012. All rights reserved.
 """
+
 import logging
 import sys
 import argparse
@@ -94,8 +101,8 @@ class TestCaseHandler:
         time.sleep(1)
         
         ## wait for emulator
-        print 'Waiting for emulator...'
         while True:
+            print 'Waiting for emulator...'
             cmd = '%(adb)s wait-for-device shell getprop init.svc.bootanim' % env
             proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if 'stopped' in proc.stdout.read():
@@ -140,7 +147,7 @@ class TestCaseHandler:
             if retry_count >= max_retry_count:
                 print 'it is time to go'
                 break
-            time.sleep(1)
+            time.sleep(3)
         print 'end...'
         
     
