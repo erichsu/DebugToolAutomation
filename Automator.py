@@ -28,6 +28,7 @@ class Automator:
         2. pass the folders one by one to the TestHandler
         """
         print 'Initilizing...'
+        print 'USE_EMULATOR = %s' % self.use_emulator
         print 'GLOBAL_CONFIG = %s' % self.global_config
         print 'TESTCASE_PREFIX = %s' % self.testcase_prefix
         print '\n'
@@ -39,7 +40,7 @@ class Automator:
         if self.testcase:
             name = self.testcase
             print '### %s ###' % name
-            tester = TestCaseHandler(TestCase(name, global_config))
+            tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator)
             tester.run()
             
         else:
@@ -51,7 +52,7 @@ class Automator:
             for test in test_list:
                 name = os.path.basename(test)
                 print '#### %s ####' % name
-                tester = TestCaseHandler(TestCase(name, global_config))
+                tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator)
                 tester.run()
 
     def _test_list(self, path_root):
@@ -61,8 +62,9 @@ class Automator:
                 if os.path.isdir(dir) and dir.startswith(self.testcase_prefix) ]
         
 class TestCaseHandler:
-    def __init__(self, test_case):
+    def __init__(self, test_case, use_emulator):
         if isinstance(test_case, TestCase):
+            self.use_emulator = use_emulator
             self.test_case = test_case
         else:
             raise TypeError
@@ -95,20 +97,21 @@ class TestCaseHandler:
         """ TODO: call the related tool to change the emulator env. """
         env = self.test_case.get_env()
         
-        ## launch emulator
-        print 'Launch emulator'
-        cmd = '%(emulator)s -avd %(os)s' % env
-        self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        time.sleep(5)
-        
-        ## wait for emulator
-        while True:
-            print 'Waiting for emulator...'
-            cmd = '%(adb)s wait-for-device shell getprop init.svc.bootanim' % env
-            proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if 'stopped' in proc.stdout.read():
-                break
+        if self.use_emulator:
+            ## launch emulator
+            print 'Launch emulator'
+            cmd = '%(emulator)s -avd %(os)s' % env
+            self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             time.sleep(5)
+        
+            ## wait for emulator
+            while True:
+                print 'Waiting for emulator...'
+                cmd = '%(adb)s wait-for-device shell getprop init.svc.bootanim' % env
+                proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                if 'stopped' in proc.stdout.read():
+                    break
+                time.sleep(5)
                 
         ## setup env by adb shell
         print 'Setup environment'
@@ -162,7 +165,8 @@ class TestCaseHandler:
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
         proc.wait()
-        self.proc_emu.terminate()
+        if self.use_emulator:
+            self.proc_emu.terminate()
         
     def _verify(self):
         print Verifier('TestCase0/config.ini', 'TestCase0').verify()
@@ -189,6 +193,8 @@ def main():
     parser = argparse.ArgumentParser(description='Autmation script for Android App testing.')
     parser.add_argument('-v', '--version', action='version', version='Automator 1.0',
                         help='show the version info')
+    parser.add_argument('-e', '--emulator', action='store_true', dest='use_emulator', default=False, 
+                        help='assign specific test case')
     parser.add_argument('-r', '--run', action='store', dest='testcase', 
                         help='assign specific test case')
     parser.add_argument('-c', '--config', action='store', dest='global_config', default='config.ini', 
@@ -200,5 +206,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    sys.argv += "-r TestCase0".split()
     sys.exit(main())
