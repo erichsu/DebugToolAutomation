@@ -33,7 +33,7 @@ class ReportMaker():
             filetype = result['type']
             conditionlist = result['result'] #tuple list
             
-            print filetype
+            #print filetype
             seltag = None
             if filetype == 'ini':
                 seltag = tagini
@@ -44,14 +44,13 @@ class ReportMaker():
             
             self._create_xml_by_result(doc, seltag, filename, filetype, conditionlist)
         
-        print 'ready output'
-        
+        #print 'ready output'
         f = open('report/tmp/'+testcase+'_'+ispass+'.xml', 'w+')
         #f.write(doc.toprettyxml(indent = '  ', newl='\r\n', encoding='utf8'))
         f.write(doc.toxml(encoding='utf8'))
         f.close()
         
-        cmd = './xslt.jar ./report/tmp'
+        cmd = 'java -jar ./xslt.jar ./report/tmp'
         proc = subprocess.Popen(cmd.split())
         proc.wait()
         
