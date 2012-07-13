@@ -17,8 +17,9 @@ import time
 import ConfigParser
 
 from AndroidSetting import AndroidSetting
+from Verifier import Verifier
 
-class Automator():
+class Automator:
     """ Main class for automation. """
     """ TODO: add log """
     def run(self):
@@ -43,7 +44,7 @@ class Automator():
             
         else:
             print 'Scanning TestCase in \n %s' % os.getcwd()
-            test_list = self._get_test_list(os.getcwd())
+            test_list = self._test_list(os.getcwd())
             print 'There are %d TestCases' % len(test_list)
             print '\n'
         
@@ -53,7 +54,7 @@ class Automator():
                 tester = TestCaseHandler(TestCase(name, global_config))
                 tester.run()
 
-    def _get_test_list(self, path_root):
+    def _test_list(self, path_root):
         """ list folders with the name heading of TESTCASE_PREFIX. """
         return [ os.path.join(path_root, dir)
                 for dir in os.listdir(path_root)
@@ -98,7 +99,7 @@ class TestCaseHandler:
         print 'Launch emulator'
         cmd = '%(emulator)s -avd %(os)s' % env
         self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        time.sleep(1)
+        time.sleep(5)
         
         ## wait for emulator
         while True:
@@ -107,7 +108,7 @@ class TestCaseHandler:
             proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if 'stopped' in proc.stdout.read():
                 break
-            time.sleep(3)
+            time.sleep(5)
                 
         ## setup env by adb shell
         print 'Setup environment'
@@ -147,7 +148,7 @@ class TestCaseHandler:
             if retry_count >= max_retry_count:
                 print 'it is time to go'
                 break
-            time.sleep(3)
+            time.sleep(5)
         print 'end...'
         
     
@@ -164,7 +165,7 @@ class TestCaseHandler:
         self.proc_emu.terminate()
         
     def _verify(self):
-        pass
+        print Verifier('TestCase0/config.ini', 'TestCase0').verify()
         
     def _report(self):
         pass
@@ -182,12 +183,6 @@ class TestCase:
     
     def get_test_script(self):
         return self.config.get('test script', 'command')
-        
-    def get_expected_result(self):
-        return self.config.items('expected result')
-    
-    def run(self):
-        pass
 
 def main():
     automator = Automator()
@@ -202,8 +197,8 @@ def main():
                         help='set Test Case prefix, (default "TestCase")')
     parser.parse_args(namespace=automator)
     automator.run()
-    
+    return 0
 
 if __name__ == "__main__":
     sys.argv += "-r TestCase0".split()
-    main()
+    sys.exit(main())
