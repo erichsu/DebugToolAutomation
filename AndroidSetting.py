@@ -33,21 +33,21 @@ class AndroidSetting(object):
         return 0
     
     def _date(self, datetime=''):
-        print 'Modify date time'
+        print 'Setup date time'
         cmd = '%(adb)s wait-for-device shell date -s %(date)s' % self.config
         proc = subprocess.Popen(cmd.split())
         proc.wait()
     
     def _battery(self, volume='50'):
-        print '_battery'
+        print 'Setup battery'
         return 0
     
     def _sms(self, msg=''):
-        print '_sms'
+        print 'Setup sms'
         return 0
     
     def _wifi(self, on_off='off'):
-        print '_wifi'
+        print 'Setup WIFI'
         return 0
         
 if __name__ == "__main__":
