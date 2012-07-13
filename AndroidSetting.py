@@ -27,9 +27,10 @@ class AndroidSetting(object):
         return status
     
     def _unlock_screen(self):
-        cmd = '%(adb)s shell input keyevent 82' % env
-        proc = subprocess.Popen(cmd.split())
-        return proc.wait()
+        #cmd = '%(adb)s shell input keyevent 82' % env
+        #proc = subprocess.Popen(cmd.split())
+        #return proc.wait()
+        return 0
     
     def _date(self, datetime=''):
         print 'Modify date time'
