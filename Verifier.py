@@ -12,7 +12,9 @@ import argparse
 import os
 
 import ConfigParser
+from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 
 class Verifier(object):
     """docstring for Verifier"""
@@ -24,7 +26,7 @@ class Verifier(object):
     def verify(self):
         """docstring for verify"""
         report = []
-        report += IniVerifier(self.config_path, self.testcase).verify()
+        #report += IniVerifier(self.config_path, self.testcase).verify()
         report += XmlVerifier(self.config_path, self.testcase).verify()
         return report
 
@@ -86,8 +88,39 @@ class XmlVerifier:
             result['type'] = 'xml'
             print 'checking %s' % result['file']
             xml_path = os.path.join(os.getcwd(), self.testcase, xml['path'])
-            parser = ElementTree()
-            parser.parse(xml_path)
+	    parser = ElementTree()
+            tree = parser.parse(xml_path)
+	    itera =  tree.getiterator()
+	    #option = xml['data']
+	    #print option[0][0], "|", option[0][1]
+	    #parser_name = option[0][0]
+	    #parser_value = option[0][1]
+	    for option in xml['data']:
+		#print 'paeser:', option[0], "|", option[1]
+	    	parser_name = option[0]
+	   	parser_value = option[1]
+
+	    	for element in itera:
+	    		#print 'value:', element.items()
+			if len(element.items())<0:
+				continue
+			elif len(element.items())<=1: #string
+				if str(element.get('name')).lower() in parser_name:
+					
+					print '**Find:', parser_name
+					print "#string name:", element.get('name')
+					print "#string value:", element.text
+			else: #int, boolean
+				if str(element.get('name')).lower() in parser_name:
+					print '**Find:', parser_name
+					print "#value type:"
+					print '#name:', element.get('name')
+					print element.attrib
+	    			#if items in option[0][0]:
+	    			#print "Element:", element.tag, "|", element.text,"|",  element.items()
+
+			#print '------'
+
             """TODO: Hello! Jarvis"""
 
         return report
