@@ -4,24 +4,8 @@
 	<xsl:template match="/">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <title>Automation Tool Test Case Report - <xsl:value-of select="testcase/id"/></title>
-
-<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-<script type="text/javascript" language="JavaScript">
-$(document).ready(function() {
-
-	$('.tc').click(function(){
-		if($(this).attr('src')=='images/sub.jpg'){
-			$(this).attr('src', 'images/add.jpg');
-			$(this).parent().parent().find('table').slideUp('fast');
-		}else{
-			$(this).attr('src', 'images/sub.jpg');
-			$(this).parent().parent().find('table').slideDown('fast');
-		}
-	});
-});
-
-</script>
 
 </head>
 <body>
