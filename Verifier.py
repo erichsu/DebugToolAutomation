@@ -10,7 +10,7 @@ Copyright (c) 2012. All rights reserved.
 import sys
 import argparse
 import os
-
+import time,sqlite3
 import ConfigParser
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
@@ -26,8 +26,9 @@ class Verifier(object):
     def verify(self):
         """docstring for verify"""
         report = []
-        #report += IniVerifier(self.config_path, self.testcase).verify()
+        report += IniVerifier(self.config_path, self.testcase).verify()
         report += XmlVerifier(self.config_path, self.testcase).verify()
+	report += DBVerifier(self.config_path, self.testcase).verify()
         return report
 
 class IniVerifier:
@@ -137,6 +138,34 @@ class XmlVerifier:
         parser = ConfigParser.ConfigParser()
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.xml') ]
+
+class DBVerifier:
+    def __init__(self, config_path=None, testcase=None):
+        self.config_path = config_path
+        self.testcase = testcase
+    
+    def verify(self):
+	report = []
+        for db in self._expected_data():
+            result = {}
+            result['result'] = []
+            result['file'] = os.path.basename(db['path'])
+            result['type'] = 'db'
+            print 'checking %s' % result['file']
+            db_path = os.path.join(os.getcwd(), self.testcase, db['path'])
+	    conn = sqlite3.connect(db_path)
+	    c = conn.cursor()
+	    c.execute('select * FROM android_metadata')
+ 	    data = c.fetchall()
+	    print data[0][0]
+
+	report.append(result)
+	return report
+
+    def _expected_data(self):
+        parser = ConfigParser.ConfigParser()
+        parser.read(self.config_path)
+        return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.db') ]
 
 def main():
     verifier = Verifier()
