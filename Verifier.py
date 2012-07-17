@@ -66,6 +66,7 @@ class IniVerifier:
                     
                 result['result'].append((option[0], option[1], is_pass))
             report.append(result)
+	    print report
         return report
     
     def _expected_data(self):
@@ -73,14 +74,14 @@ class IniVerifier:
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.ini') ]
     
-
+#Only support Android Perference type.
 class XmlVerifier:
     def __init__(self, config_path=None, testcase=None):
         self.config_path = config_path
         self.testcase = testcase
     
     def verify(self):
-        report = []
+	report = []
         for xml in self._expected_data():
             result = {}
             result['result'] = []
@@ -91,38 +92,45 @@ class XmlVerifier:
 	    parser = ElementTree()
             tree = parser.parse(xml_path)
 	    itera =  tree.getiterator()
-	    #option = xml['data']
-	    #print option[0][0], "|", option[0][1]
-	    #parser_name = option[0][0]
-	    #parser_value = option[0][1]
 	    for option in xml['data']:
-		#print 'paeser:', option[0], "|", option[1]
 	    	parser_name = option[0]
 	   	parser_value = option[1]
 
 	    	for element in itera:
+			is_pass = False
+			has_option = False
 	    		#print 'value:', element.items()
 			if len(element.items())<0:
+				#is_pass = False
+				#result['result'].append((parser_name, parser_value, is_pass))
 				continue
 			elif len(element.items())<=1: #string
 				if str(element.get('name')).lower() in parser_name:
-					
-					print '**Find:', parser_name
-					print "#string name:", element.get('name')
-					print "#string value:", element.text
+					has_option = True
+					if parser_value in element.text:
+						is_pass = True
+						print '**Find:', parser_name
+					#print "#string name:", element.get('name')
+					#print "#string value:", element.text
+				else:
+					is_pass = False
 			else: #int, boolean
 				if str(element.get('name')).lower() in parser_name:
-					print '**Find:', parser_name
-					print "#value type:"
-					print '#name:', element.get('name')
-					print element.attrib
-	    			#if items in option[0][0]:
-	    			#print "Element:", element.tag, "|", element.text,"|",  element.items()
-
-			#print '------'
-
-            """TODO: Hello! Jarvis"""
-
+					has_option = True
+					if parser_value in element.get('value'):
+						is_pass = True
+						print '**Find:', parser_name
+					#print "#value type:"
+					#print '#name:', element.get('name')
+					#print element.attrib
+				else:
+					is_pass = False
+	    	    	if has_option:
+	        	    result['result'].append((parser_name, parser_value, is_pass))
+			    is_pass = False
+			    has_option = False
+	
+	report.append(result)
         return report
     
     def _expected_data(self):
