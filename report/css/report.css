@@ -30,6 +30,10 @@ br.clearfix {
 	clear: both;
 }
 
+img {
+	vertical-align:middle;
+}
+
 img.alignleft {
 	float: left;
 	margin: 5px 30px 20px 0;
@@ -53,6 +57,7 @@ ul h4 {
 
 a {
 	color: #2A3436;
+	
 }
 
 .box {
@@ -99,14 +104,16 @@ a {
 #sidebar {
 	position: relative;
 	left: -20px;
-	top: -20px;
+	top: 20px;
 	float: left;
-	width: 240px;
+	width: 200px;
 	background: #EEF5F6;
 	padding: 20px;
 	border: solid 1px #D6E0E2;
 	text-shadow: 1px 1px 0px rgba(255,255,255,1);
 	box-shadow: inset 0px 0px 0px 1px #fff;
+	overflow: auto;
+	height: 300px;
 }
 
 #content {

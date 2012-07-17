@@ -126,5 +126,21 @@ if __name__ == '__main__':
                                             ['db.status','updated',True],
                                             ['db.updatetime','20120713.123456','20120712.123456'])}])
     
+    reportmarker.export_result('testcase3',
+                                [{'file':'welldone.ini',
+                                  'type':'ini',
+                                  'result':(
+                                            ['ini.status','updated',True],
+                                            ['ini.updatetime','20120713.123456',True])},
+                                 {'file':'oooo.ini',
+                                  'type':'ini',
+                                  'result':(
+                                            ['ini.status2','updated',True],
+                                            ['ini.updatetime2','20120713.123456',True])},
+                                 {'file':'xxxx.db',
+                                  'type':'db',
+                                  'result':(
+                                            ['db.status','updated',True],
+                                            ['db.updatetime','20120713.123456',True])}])
     
     reportmarker.finish()

@@ -12,7 +12,7 @@
 
 <script type="text/javascript" language="JavaScript">
 function registerToggle(){
-	$('.tc').click(function(){
+	$('.tc').bind('click', function(){
 		if($(this).attr('src')=='images/sub.jpg'){
 			$(this).attr('src', 'images/add.jpg');
 			$(this).parent().parent().find('table').slideUp('fast');
@@ -32,13 +32,14 @@ $(document).ready(function() {
 	else
 		hrefstr = 1;
 	
-	$("#content").load("testcase"+hrefstr+".html");
-	
-	registerToggle();
+	$("#content").load("testcase"+hrefstr+".html", function(){
+		registerToggle();
+	});
 
 	$("a[id^=testcase]").click(function(){
-		$("#content").load($(this).attr('id')+".html");
-		registerToggle();
+		$("#content").load($(this).attr('id')+".html", function(){
+			registerToggle();
+		});
 	});
 	
 });
@@ -56,11 +57,51 @@ $(document).ready(function() {
 			<div class="box">
 				<ul class="list">
 				<xsl:for-each select="overview/testcase">
+				
 				<xsl:choose>
-				<xsl:when test="position() = 1"><li class="first"><a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a></li></xsl:when>
-				<xsl:when test="position() = last()"><li class="last"><a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a></li></xsl:when>
-				<xsl:otherwise><li><a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a></li></xsl:otherwise>
+				<xsl:when test="position() = 1">
+				<li class="first">
+					<xsl:choose>
+					<xsl:when test="self::node()[@status='pass']">
+					<img src="images/testcase_pass.jpg"/>
+					</xsl:when>
+					<xsl:otherwise>
+					<img src="images/testcase_fail.jpg"/>
+					</xsl:otherwise>
+					</xsl:choose>
+				<a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a>
+				</li>
+				</xsl:when>
+				
+				<xsl:when test="position() = last()">
+				<li class="last">
+					<xsl:choose>
+					<xsl:when test="self::node()[@status='pass']">
+					<img src="images/testcase_pass.jpg"/>
+					</xsl:when>
+					<xsl:otherwise>
+					<img src="images/testcase_fail.jpg"/>
+					</xsl:otherwise>
+					</xsl:choose>
+				<a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a>
+				</li>
+				</xsl:when>
+				
+				<xsl:otherwise>
+				<li>
+					<xsl:choose>
+					<xsl:when test="self::node()[@status='pass']">
+					<img src="images/testcase_pass.jpg"/>
+					</xsl:when>
+					<xsl:otherwise>
+					<img src="images/testcase_fail.jpg"/>
+					</xsl:otherwise>
+					</xsl:choose>
+				<a href="#{position()}" id='{self::node()[text()]}'><xsl:value-of select="self::node()[text()]"/></a>
+				</li>
+				</xsl:otherwise>
 				</xsl:choose>
+
 				</xsl:for-each>
 				</ul>
 			</div>
