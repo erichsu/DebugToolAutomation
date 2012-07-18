@@ -18,6 +18,7 @@ import ConfigParser
 
 from AndroidSetting import AndroidSetting
 from Verifier import Verifier
+from ReportMaker import ReportMaker
 
 class Automator:
     """ Main class for automation. """
@@ -169,10 +170,10 @@ class TestCaseHandler:
             self.proc_emu.terminate()
         
     def _verify(self):
-        print Verifier('TestCase0/config.ini', 'TestCase0').verify()
+        self.result = Verifier('TestCase0/config.ini', 'TestCase0').verify()
         
     def _report(self):
-        pass
+        ReportMaker().export_result(self.test_case.name, self.result)
 
 class TestCase:
     def __init__(self, name, global_config=None):
