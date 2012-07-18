@@ -14,9 +14,9 @@ class ReportMaker():
         self.ispass = 'fail'
         
         path = './report'
-        for file in os.listdir(path):
-            if file.endswith('html'):
-                filepath = os.path.join(path, file)
+        for f in os.listdir(path):
+            if f.endswith('html'):
+                filepath = os.path.join(path, f)
                 os.remove(filepath)
         
     
