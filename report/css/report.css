@@ -124,6 +124,7 @@ a {
 
 #wrapper {
 	width: 978px;
+	min-height: 500px;
 	position: relative;
 	background: #FFF;
 	margin: 0 auto 0 auto;

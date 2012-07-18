@@ -6,11 +6,19 @@ Created on Jul 12, 2012
 
 from xml.dom.minidom import Document
 import subprocess
+import os
 
 class ReportMaker():
     
     def __init__(self):
         self.ispass = 'fail'
+        
+        path = './report'
+        for file in os.listdir(path):
+            if file.endswith('html'):
+                filepath = os.path.join(path, file)
+                os.remove(filepath)
+        
     
     def finish(self):
         cmd = 'java -jar ./xslt.jar ./report/tmp 1'
@@ -87,11 +95,10 @@ class ReportMaker():
         return newtag 
 
 if __name__ == '__main__':
+    #init reportMaker and clear html which generated last time
     reportmarker = ReportMaker()
     
-    
-    
-    
+    #generate testcase report
     reportmarker.export_result('testcase1',
                                 [{'file':'xxxx.ini',
                                   'type':'ini',
@@ -142,5 +149,6 @@ if __name__ == '__main__':
                                   'result':(
                                             ['db.status','updated',True],
                                             ['db.updatetime','20120713.123456',True])}])
-    
+    #generate overview.html
     reportmarker.finish()
+    

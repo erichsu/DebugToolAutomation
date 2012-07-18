@@ -13,14 +13,10 @@
 <script type="text/javascript" language="JavaScript">
 function registerToggle(){
 	$('.tc').bind('click', function(){
-		if($(this).attr('src')=='images/sub.jpg'){
-			$(this).attr('src', 'images/add.jpg');
-			$(this).parent().parent().find('table').slideUp('fast');
-		}else{
-			$(this).attr('src', 'images/sub.jpg');
-			$(this).parent().parent().find('table').slideDown('fast');
-		}
+		$(this).parent().parent().find('div').slideToggle('slow');
 	});
+	$('.togglepoint').hide();
+	$('.togglepoint').slideDown('fast');
 }
 
 $(document).ready(function() {

@@ -14,6 +14,7 @@
 <xsl:for-each select="testcase/inis/ini">
 <div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>ini</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -39,12 +40,14 @@
 	</tr>
 	</xsl:for-each>
 </table>
+</div>
 </div>
 </xsl:for-each>
 
 <xsl:for-each select="testcase/dbs/db">
 <div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>db</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -71,11 +74,13 @@
 	</xsl:for-each>
 </table>
 </div>
+</div>
 </xsl:for-each>
 
 <xsl:for-each select="testcase/xmls/xml">
 <div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>xml</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -101,6 +106,7 @@
 	</tr>
 	</xsl:for-each>
 </table>
+</div>
 </div>
 </xsl:for-each>
 
