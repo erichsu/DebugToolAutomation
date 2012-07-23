@@ -28,7 +28,7 @@ class Verifier(object):
         report = []
         report += IniVerifier(self.config_path, self.testcase).verify()
         report += XmlVerifier(self.config_path, self.testcase).verify()
-	report += DBVerifier(self.config_path, self.testcase).verify()
+        report += DBVerifier(self.config_path, self.testcase).verify()
         return report
 
 class IniVerifier:
