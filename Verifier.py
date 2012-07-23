@@ -67,7 +67,7 @@ class IniVerifier:
                     
                 result['result'].append((option[0], option[1], is_pass))
             report.append(result)
-	    print report
+            print report
         return report
     
     def _expected_data(self):
@@ -82,7 +82,7 @@ class XmlVerifier:
         self.testcase = testcase
     
     def verify(self):
-	report = []
+        report = []
         for xml in self._expected_data():
             result = {}
             result['result'] = []
@@ -90,48 +90,48 @@ class XmlVerifier:
             result['type'] = 'xml'
             print 'checking %s' % result['file']
             xml_path = os.path.join(os.getcwd(), self.testcase, xml['path'])
-	    parser = ElementTree()
+            parser = ElementTree()
             tree = parser.parse(xml_path)
-	    itera =  tree.getiterator()
-	    for option in xml['data']:
-	    	parser_name = option[0]
-	   	parser_value = option[1]
+            itera =  tree.getiterator()
+            for option in xml['data']:
+                parser_name = option[0]
+                parser_value = option[1]
 
-	    	for element in itera:
-			is_pass = False
-			has_option = False
-	    		#print 'value:', element.items()
-			if len(element.items())<0:
-				#is_pass = False
-				#result['result'].append((parser_name, parser_value, is_pass))
-				continue
-			elif len(element.items())<=1: #string
-				if str(element.get('name')).lower() in parser_name:
-					has_option = True
-					if parser_value in element.text:
-						is_pass = True
-						print '**Find:', parser_name
-					#print "#string name:", element.get('name')
-					#print "#string value:", element.text
-				else:
-					is_pass = False
-			else: #int, boolean
-				if str(element.get('name')).lower() in parser_name:
-					has_option = True
-					if parser_value in element.get('value'):
-						is_pass = True
-						print '**Find:', parser_name
-					#print "#value type:"
-					#print '#name:', element.get('name')
-					#print element.attrib
-				else:
-					is_pass = False
-	    	    	if has_option:
-	        	    result['result'].append((parser_name, parser_value, is_pass))
-			    is_pass = False
-			    has_option = False
-	
-	report.append(result)
+                for element in itera:
+                    is_pass = False
+                    has_option = False
+                    #print 'value:', element.items()
+                    if len(element.items())<0:
+                        #is_pass = False
+                        #result['result'].append((parser_name, parser_value, is_pass))
+                        continue
+                    elif len(element.items())<=1: #string
+                        if str(element.get('name')).lower() in parser_name:
+                            has_option = True
+                            if parser_value in element.text:
+                                is_pass = True
+                                print '**Find:', parser_name
+                            #print "#string name:", element.get('name')
+                            #print "#string value:", element.text
+                        else:
+                            is_pass = False
+                    else: #int, boolean
+                        if str(element.get('name')).lower() in parser_name:
+                            has_option = True
+                            if parser_value in element.get('value'):
+                                is_pass = True
+                                print '**Find:', parser_name
+                            #print "#value type:"
+                            #print '#name:', element.get('name')
+                            #print element.attrib
+                        else:
+                            is_pass = False
+                    if has_option:
+                        result['result'].append((parser_name, parser_value, is_pass))
+                        is_pass = False
+                        has_option = False
+        
+        report.append(result)
         return report
     
     def _expected_data(self):
@@ -145,7 +145,7 @@ class DBVerifier:
         self.testcase = testcase
     
     def verify(self):
-	report = []
+        report = []
         for db in self._expected_data():
             result = {}
             result['result'] = []
@@ -153,14 +153,14 @@ class DBVerifier:
             result['type'] = 'db'
             print 'checking %s' % result['file']
             db_path = os.path.join(os.getcwd(), self.testcase, db['path'])
-	    conn = sqlite3.connect(db_path)
-	    c = conn.cursor()
-	    c.execute('select * FROM android_metadata')
- 	    data = c.fetchall()
-	    print data[0][0]
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            c.execute('select * FROM android_metadata')
+            data = c.fetchall()
+            print data[0][0]
 
-	report.append(result)
-	return report
+        report.append(result)
+        return report
 
     def _expected_data(self):
         parser = ConfigParser.ConfigParser()
