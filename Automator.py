@@ -173,7 +173,9 @@ class TestCaseHandler:
         self.result = Verifier('TestCase0/config.ini', 'TestCase0').verify()
         
     def _report(self):
-        ReportMaker().export_result(self.test_case.name, self.result)
+        report_maker = ReportMaker()
+        report_maker.export_result(self.test_case.name, self.result)
+        report_maker.finish()
 
 class TestCase:
     def __init__(self, name, global_config=None):
