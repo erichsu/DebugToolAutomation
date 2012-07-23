@@ -7,28 +7,14 @@
 <title>Automation Tool Test Case Report - <xsl:value-of select="testcase/id"/></title>
 
 <script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-<script type="text/javascript" language="JavaScript">
-$(document).ready(function() {
-
-	$('.tc').click(function(){
-		if($(this).attr('src')=='images/sub.jpg'){
-			$(this).attr('src', 'images/add.jpg');
-			$(this).parent().parent().find('table').slideUp('fast');
-		}else{
-			$(this).attr('src', 'images/sub.jpg');
-			$(this).parent().parent().find('table').slideDown('fast');
-		}
-	});
-});
-
-</script>
 
 </head>
 <body>
 
 <xsl:for-each select="testcase/inis/ini">
-<div>
+<div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>ini</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -54,12 +40,14 @@ $(document).ready(function() {
 	</tr>
 	</xsl:for-each>
 </table>
+</div>
 </div>
 </xsl:for-each>
 
 <xsl:for-each select="testcase/dbs/db">
-<div>
+<div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>db</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -86,11 +74,13 @@ $(document).ready(function() {
 	</xsl:for-each>
 </table>
 </div>
+</div>
 </xsl:for-each>
 
 <xsl:for-each select="testcase/xmls/xml">
-<div>
+<div class="box">
 <h1><img class="tc" alt="collapse" src="images/sub.jpg"/>xml</h1>
+<div class="togglepoint">
 <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
 	<tr bgcolor="#ccccff">
 	<th align="left" colspan="3">
@@ -116,6 +106,7 @@ $(document).ready(function() {
 	</tr>
 	</xsl:for-each>
 </table>
+</div>
 </div>
 </xsl:for-each>
 
