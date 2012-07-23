@@ -21,7 +21,7 @@ class ReportMaker():
         
     
     def finish(self):
-        cmd = 'java -jar ./xslt.jar ./report/tmp 1'
+        cmd = 'java -jar ./report/lib/xslt.jar ./report/tmp 1'
         proc = subprocess.Popen(cmd.split())
         proc.wait()
     
@@ -60,7 +60,7 @@ class ReportMaker():
         f.write(doc.toxml(encoding='utf8'))
         f.close()
         
-        cmd = 'java -jar ./xslt.jar ./report/tmp'
+        cmd = 'java -jar ./report/lib/xslt.jar ./report/tmp'
         proc = subprocess.Popen(cmd.split())
         proc.wait()
         
