@@ -110,6 +110,39 @@
 </div>
 </xsl:for-each>
 
+<xsl:for-each select="testcase/logs/log">
+<div class="box">
+<h1><img class="tc" alt="collapse" src="images/sub.jpg"/>log</h1>
+<div class="togglepoint">
+<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+	<tr bgcolor="#ccccff">
+	<th align="left" colspan="3">
+	<font size="+2"><b><xsl:value-of select="filename"/></b></font>
+	</th>
+	</tr>
+	
+	<tr bgcolor="#eeeeee">
+	<th>key</th>
+	<th>expected</th>
+	<th>status</th>
+	</tr>
+	<xsl:for-each select="conds/cond">
+	<tr bgcolor="white">
+	<td width="20%"><b><xsl:value-of select="key"/></b></td>
+	<td><xsl:value-of select="value"/></td>
+	<td>
+	<xsl:choose>
+	<xsl:when test="status = 'True'"><img alt="succ" src="images/succ.jpg"/></xsl:when>
+	<xsl:otherwise><img alt="fail" src="images/fail.jpg"/><xsl:value-of select="status"/></xsl:otherwise>
+	</xsl:choose>
+	</td>
+	</tr>
+	</xsl:for-each>
+</table>
+</div>
+</div>
+</xsl:for-each>
+
 </body>
 </html>
 	</xsl:template>

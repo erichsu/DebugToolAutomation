@@ -37,6 +37,7 @@ class ReportMaker():
         tagini = self._add_tag(doc, root, 'inis')
         tagdb = self._add_tag(doc, root, 'dbs')
         tagxml = self._add_tag(doc, root, 'xmls')
+        taglog = self._add_tag(doc, root, 'logs')
         
         for result in results:
             filename = result['file']
@@ -51,6 +52,8 @@ class ReportMaker():
                 seltag = tagdb
             elif filetype == 'xml':
                 seltag = tagxml
+            elif filetype == 'log':
+                seltag = taglog
             
             self._create_xml_by_result(doc, seltag, filename, filetype, conditionlist)
         
