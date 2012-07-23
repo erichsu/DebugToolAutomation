@@ -32,7 +32,7 @@ $(document).ready(function() {
 		registerToggle();
 	});
 
-	$("a[id^=testcase]").click(function(){
+	$(".list a").click(function(){
 		$("#content").load($(this).attr('id')+".html", function(){
 			registerToggle();
 		});
