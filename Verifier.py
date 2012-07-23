@@ -10,6 +10,7 @@ Copyright (c) 2012. All rights reserved.
 import sys
 import argparse
 import os
+import re
 import time,sqlite3
 import ConfigParser
 from xml.etree.ElementTree import Element
@@ -26,9 +27,10 @@ class Verifier(object):
     def verify(self):
         """docstring for verify"""
         report = []
-        report += IniVerifier(self.config_path, self.testcase).verify()
-        report += XmlVerifier(self.config_path, self.testcase).verify()
-	report += DBVerifier(self.config_path, self.testcase).verify()
+        #report += IniVerifier(self.config_path, self.testcase).verify()
+        #report += XmlVerifier(self.config_path, self.testcase).verify()
+	#report += DBVerifier(self.config_path, self.testcase).verify()
+	report += LOGVerifier(self.config_path, self.testcase).verify()
         return report
 
 class IniVerifier:
@@ -166,6 +168,41 @@ class DBVerifier:
         parser = ConfigParser.ConfigParser()
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.db') ]
+
+class LOGVerifier:
+    def __init__(self, config_path=None, testcase=None):
+        self.config_path = config_path
+        self.testcase = testcase
+    
+    def verify(self):
+	report = []
+        for log in self._expected_data():
+            result = {}
+            result['result'] = []
+            result['file'] = os.path.basename(log['path'])
+            result['type'] = 'log'
+            print 'checking %s' % result['file']
+            f = open("TestCase0/" + log['path']) 
+	    buf = f.readline()
+	    while buf:
+	        #print buf
+		#m=re.search('(\s{0,}\d{2}\-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{2,}\s{0,}\d{1,}:0x[0-9a-fA-F]{0,}\s{0,}) (WVDIE)/(\w{1,}): (\w{1,})', buf)
+		#m=re.search('(\w)-(\w) (\d):(\d):(\d).(\d) (\w)/(\w)(\d): (\w)', buf)
+	    	#07-23 09:45:09.686 I/ActivityManager( 1422): Process com.trendmicro.tmmssuite.consumer (pid 21855) has died.
+		m=re.search('(\d*-\d* \d*:\d*:\d*.\d*) (\w*)\/(\w\D*)(\d*)(.*)', buf)
+		#m = re.search('(\w*) (\w*) ((\w*) \w*)', 'it is fine today')
+		print m.group(5)
+	    	buf = f.readline()
+
+	    f.close()
+
+	report.append(result)
+	return report
+
+    def _expected_data(self):
+        parser = ConfigParser.ConfigParser()
+        parser.read(self.config_path)
+        return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.log') ]
 
 def main():
     verifier = Verifier()
