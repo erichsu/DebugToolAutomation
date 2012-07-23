@@ -10,6 +10,7 @@ Copyright (c) 2012. All rights reserved.
 import sys
 import argparse
 import os
+import re
 import time,sqlite3
 import ConfigParser
 from xml.etree.ElementTree import Element
@@ -166,6 +167,68 @@ class DBVerifier:
         parser = ConfigParser.ConfigParser()
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.db') ]
+
+class LOGVerifier:
+    def __init__(self, config_path=None, testcase=None):
+        self.config_path = config_path
+        self.testcase = testcase
+    
+    def verify(self):
+        report = []
+        for log in self._expected_data():
+            result = {}
+            result['result'] = []
+            result['file'] = os.path.basename(log['path'])
+            result['type'] = 'log'
+            print 'checking %s' % result['file']
+            parser_filter = ''
+
+            for option in log['data']:
+                if option[0] in 'filter':
+                    print 'filter:' + option[1]
+                    parser_filter = option[1]
+                    result['result'].append((option[0], option[1], True))
+                    continue
+                else:
+                    parser_name = option[0]
+                    parser_value = option[1]
+                #print parser_name + ' ' + parser_value
+                
+                f = open("TestCase0/" + log['path'])
+                buf = f.readline()
+                is_find = False
+                while buf:
+                    #print buf
+                    #m=re.search('(\s{0,}\d{2}\-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{2,}\s{0,}\d{1,}:0x[0-9a-fA-F]{0,}\s{0,}) (WVDIE)/(\w{1,}): (\w{1,})', buf)
+                    #m=re.search('(\w)-(\w) (\d):(\d):(\d).(\d) (\w)/(\w)(\d): (\w)', buf)
+                    #07-23 09:45:09.686 I/ActivityManager( 1422): Process com.trendmicro.tmmssuite.consumer (pid 21855) has died.
+                    m = re.search('(?P<time>\d*-\d* \d*:\d*:\d*.\d*) (?P<type>\w*)\/(?P<tag>\w\D*)(?P<pid>\d*)(?P<content>.*)', buf)
+                    #m = re.search('(\w*) (\w*) ((\w*) \w*)', 'it is fine today')
+                    tag = m.group('tag')
+                    content = m.group('content').rstrip()
+                    #print tag + '|' + parser_filter
+                    find_filter = re.search(parser_filter, tag, re.IGNORECASE) 
+                    if find_filter: #str(tag).lower() in parser_filter.lower():
+                        find_content = re.search(parser_value, content, re.IGNORECASE)
+                        #print bool(find)
+                        if find_content: #cmp(content.lower(), parser_value.lower()):
+                            #print 'TRUE' + content.lower() + '      ' + parser_value.lower()
+                            result['result'].append((parser_name, parser_value, True))
+                            is_find = True
+                            #break
+                        
+                    buf = f.readline()
+                if not is_find:
+                    result['result'].append((parser_name, parser_value, False))
+                f.close()
+
+        report.append(result)
+        return report
+
+    def _expected_data(self):
+        parser = ConfigParser.ConfigParser()
+        parser.read(self.config_path)
+        return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.log') ]
 
 def main():
     verifier = Verifier()
