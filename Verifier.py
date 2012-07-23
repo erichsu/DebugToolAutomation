@@ -203,16 +203,16 @@ class LOGVerifier:
 		    #m=re.search('(\s{0,}\d{2}\-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{2,}\s{0,}\d{1,}:0x[0-9a-fA-F]{0,}\s{0,}) (WVDIE)/(\w{1,}): (\w{1,})', buf)
 		    #m=re.search('(\w)-(\w) (\d):(\d):(\d).(\d) (\w)/(\w)(\d): (\w)', buf)
 	    	    #07-23 09:45:09.686 I/ActivityManager( 1422): Process com.trendmicro.tmmssuite.consumer (pid 21855) has died.
-		    m=re.search('(?P<time>\d*-\d* \d*:\d*:\d*.\d*) (?P<type>\w*)\/(?P<tag>\w\D*)(?P<pid>\d*)(?P<content>.*)', buf)
+		    m = re.search('(?P<time>\d*-\d* \d*:\d*:\d*.\d*) (?P<type>\w*)\/(?P<tag>\w\D*)(?P<pid>\d*)(?P<content>.*)', buf)
 		    #m = re.search('(\w*) (\w*) ((\w*) \w*)', 'it is fine today')
 		    tag = m.group('tag')
 		    content = m.group('content').rstrip()
 		    #print tag + '|' + parser_filter
-		    
-		    if str(tag).lower() in parser_filter.lower():
-			find = re.search(parser_value, content, re.IGNORECASE)
+		    find_filter = re.search(parser_filter, tag, re.IGNORECASE) 
+		    if find_filter: #str(tag).lower() in parser_filter.lower():
+			find_content = re.search(parser_value, content, re.IGNORECASE)
 			#print bool(find)
-			if find: #cmp(content.lower(), parser_value.lower()):
+			if find_content: #cmp(content.lower(), parser_value.lower()):
 			    #print 'TRUE' + content.lower() + '      ' + parser_value.lower()
 			    result['result'].append((parser_name, parser_value, True))
 			    is_find = True
