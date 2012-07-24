@@ -29,8 +29,8 @@ class Verifier(object):
         report = []
         #report += IniVerifier(self.config_path, self.testcase).verify()
         #report += XmlVerifier(self.config_path, self.testcase).verify()
-	#report += DBVerifier(self.config_path, self.testcase).verify()
-	report += LOGVerifier(self.config_path, self.testcase).verify()
+	report += DBVerifier(self.config_path, self.testcase).verify()
+	#report += LOGVerifier(self.config_path, self.testcase).verify()
         return report
 
 class IniVerifier:
@@ -157,9 +157,22 @@ class DBVerifier:
             db_path = os.path.join(os.getcwd(), self.testcase, db['path'])
 	    conn = sqlite3.connect(db_path)
 	    c = conn.cursor()
-	    c.execute('select * FROM android_metadata')
- 	    data = c.fetchall()
-	    print data[0][0]
+	    db_table = ''
+	    for option in db['data']:
+	        if option[0] in 'table':
+		    db_table = option[1]
+		    result['result'].append((option[0], option[1], True))
+		    continue    
+	        db_col = option[0]
+	   	db_value = option[1]
+		#print db_table + ' ' + db_col + ' ' + db_value
+		db_str = 'select * FROM ' + db_table + ' WHERE ' + db_col + " LIKE '%" + db_value + "%'"
+		#print db_str
+	    	c.execute(db_str)
+ 	    	data = c.fetchall()
+	    #print len(data)
+	    if len(data) > 0:
+	        result['result'].append((db_col, db_value, True))
 
 	report.append(result)
 	return report
