@@ -162,7 +162,6 @@ class TestCaseHandler:
         proc.wait()
     
     def _collect_result(self):
-        """ TODO: use adb shell to get result in SD card folder """
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
         proc.wait()
@@ -170,7 +169,7 @@ class TestCaseHandler:
             self.proc_emu.terminate()
         
     def _verify(self):
-        self.result = Verifier('TestCase0/config.ini', 'TestCase0').verify()
+        self.result = Verifier(self.test_case.config_path, self.test_case.name).verify()
         
     def _report(self):
         report_maker = ReportMaker()
