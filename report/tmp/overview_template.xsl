@@ -20,8 +20,8 @@ function registerToggle(){
 			$(this).attr('src', 'images/sub.jpg');
 		}
 	});
-	$('.togglepoint').hide();
-	$('.togglepoint').slideDown('fast');
+	//$('.togglepoint').hide();
+	//$('.togglepoint').slideDown('fast');
 }
 
 $(document).ready(function() {
@@ -29,11 +29,11 @@ $(document).ready(function() {
 	var hrefstr = $(location).attr('href'); 
 	var find = hrefstr.indexOf('#');
 	if(find >0 &amp;&amp; (find+1) &lt; hrefstr.length)
-		hrefstr = hrefstr.substring(find+1, hrefstr.length);
+		hrefstr = hrefstr.substring(find, hrefstr.length);
 	else
-		hrefstr = 1;
+		hrefstr = "";
 	
-	$("#content").load("testcase"+hrefstr+".html", function(){
+	$("#content").load( $("[href="+ hrefstr +"]").attr('id') +".html", function(){
 		registerToggle();
 	});
 

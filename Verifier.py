@@ -122,6 +122,8 @@ class XmlVerifier:
                                 #print '**Find:', parser_name + ' ' + str(element.text)
                             #print "#string name:", element.get('name')
                             #print "#string value:", element.text
+                            else:
+                                is_pass = xml_parser_value
                         else:
                             is_pass = False
                     else: #int, boolean
@@ -137,6 +139,8 @@ class XmlVerifier:
                             #print "#value type:"
                             #print '#name:', element.get('name')
                             #print element.attrib
+                            else:
+                                is_pass = element.get('value')
                         else:
                             is_pass = False
                     if has_option:
@@ -179,20 +183,19 @@ class DBVerifier:
             c = conn.cursor()
             db_table = ''
             for option in db['data']:
-                if option[0] in 'table':
+                if option[0] == 'table':
                     db_table = option[1]
-                    result['result'].append((option[0], option[1], True))
+                    result['file'] += '/' + db_table
                     continue    
                 db_col = option[0]
                 db_value = option[1]
-                #print db_table + ' ' + db_col + ' ' + db_value
+                # print db_table + ' ' + db_col + ' ' + db_value
                 db_str = 'select * FROM ' + db_table + ' WHERE ' + db_col + " LIKE '%" + db_value + "%'"
                 #print db_str
                 c.execute(db_str)
                 data = c.fetchall()
-            #print len(data)
-            if len(data) > 0:
-                result['result'].append((db_col, db_value, True))
+                #print len(data)
+            result['result'].append((db_col, db_value, len(data)))
 
             report.append(result)
         return report
@@ -215,48 +218,58 @@ class LOGVerifier:
             result['file'] = os.path.basename(log['path'])
             result['type'] = 'log'
             print 'checking %s' % result['file']
+            
+            parser_tag = ''
             parser_filter = ''
             log_path = os.path.join(os.getcwd(), self.testcase, log['path'])
-
+            parser_values = []
             for option in log['data']:
-                if option[0] in 'filter':
+                if option[0] == 'tag':
+                    parser_tag = option[1]
+                elif option[0] == 'filter':
                     print 'filter:' + option[1]
                     parser_filter = option[1]
-                    result['result'].append((option[0], option[1], True))
-                    continue
-                else:
-                    parser_name = option[0]
-                    parser_value = option[1]
-                #print parser_name + ' ' + parser_value
-                
-                f = open(log_path)
+                    result['file'] += '[filter:' + option[1] +']'
+                elif option[0] == 'value_last':
+                    parser_last_value = option[1]
+                    # parser_values.append(option[1])
+                elif 'value' in option[0]:
+                    parser_values.insert(int(option[0][6:]), option[1])
+            # print parser_values
+            
+            f = open(log_path)
+            buf = f.readline()
+            filter_contents = []
+            find_count = 0
+            while buf:
+                m = re.search('(?P<time>\d*-\d* \d*:\d*:\d*.\d*) (?P<type>\w*)\/(?P<tag>\w\D*)(?P<pid>\d*)([)]?)(?P<content>.*)', buf)
+                tag = m.group('tag')
+                time = m.group('time')
+                content = m.group('content').rstrip()
+                find_tag = re.search(parser_tag, tag, re.IGNORECASE) 
+                find_filter = re.search(parser_filter, content, re.IGNORECASE) 
+                if find_tag and find_filter:
+                    filter_contents.append((find_count, (content, time)))
+                    find_count += 1
                 buf = f.readline()
-                is_find = False
-                while buf:
-                    #print buf
-                    #m=re.search('(\s{0,}\d{2}\-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{2,}\s{0,}\d{1,}:0x[0-9a-fA-F]{0,}\s{0,}) (WVDIE)/(\w{1,}): (\w{1,})', buf)
-                    #m=re.search('(\w)-(\w) (\d):(\d):(\d).(\d) (\w)/(\w)(\d): (\w)', buf)
-                    #07-23 09:45:09.686 I/ActivityManager( 1422): Process com.trendmicro.tmmssuite.consumer (pid 21855) has died.
-                    m = re.search('(?P<time>\d*-\d* \d*:\d*:\d*.\d*) (?P<type>\w*)\/(?P<tag>\w\D*)(?P<pid>\d*)(?P<content>.*)', buf)
-                    #m = re.search('(\w*) (\w*) ((\w*) \w*)', 'it is fine today')
-                    tag = m.group('tag')
-                    content = m.group('content').rstrip()
-                    #print tag + '|' + parser_filter
-                    find_filter = re.search(parser_filter, tag, re.IGNORECASE) 
-                    if find_filter: #str(tag).lower() in parser_filter.lower():
-                        find_content = re.search(parser_value, content, re.IGNORECASE)
-                        #print bool(find)
-                        if find_content: #cmp(content.lower(), parser_value.lower()):
-                            #print 'TRUE' + content.lower() + '      ' + parser_value.lower()
-                            result['result'].append((parser_name, parser_value, True))
-                            is_find = True
-                            #break
-                        
-                    buf = f.readline()
-                if not is_find:
-                        result['result'].append((parser_name, parser_value, False))
-                f.close()
-
+            f.close()
+            for i, content in filter_contents:
+                # print i
+                if i < len(parser_values):
+                    # print i, parser_values[i]
+                    find_content = re.search(parser_values[i], content[0], re.IGNORECASE)
+                    if find_content:
+                        # print 'found'
+                        result['result'].append(('value_' + str(i), parser_values[i], True))
+                    else:
+                        result['result'].append(('value_' + str(i), parser_values[i], content[1] + content[0]))
+                elif i == len(filter_contents) - 1:
+                    find_content = re.search(parser_last_value, content[0], re.IGNORECASE)
+                    if find_content:
+                        # print 'found'
+                        result['result'].append(('value_last', parser_last_value, True))
+                    else:
+                        result['result'].append(('value_last', parser_last_value, content[1] + content[0]))
             report.append(result)
         return report
 
