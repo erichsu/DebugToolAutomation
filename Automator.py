@@ -55,6 +55,7 @@ class Automator:
                 print '#### %s ####' % name
                 tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator)
                 tester.run()
+        tester.report_maker.finish()
 
     def _test_list(self, path_root):
         """ list folders with the name heading of TESTCASE_PREFIX. """
@@ -157,9 +158,16 @@ class TestCaseHandler:
         
     
     def _trigger_test(self):
-        cmd = self.test_case.get_test_script()
-        proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
-        proc.wait()
+        err_count = 0
+        while(1):
+            cmd = self.test_case.get_test_script()
+            proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            ret = proc.communicate()
+            if ret[0] is None or err_count > 3:
+                break
+            err_count += 1
+            print 'Monkey Runner Error!!!'
+            print ret[0]
     
     def _collect_result(self):
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
@@ -174,7 +182,7 @@ class TestCaseHandler:
     def _report(self):
         report_maker = ReportMaker()
         report_maker.export_result(self.test_case.name, self.result)
-        report_maker.finish()
+        self.report_maker = report_maker
 
 class TestCase:
     def __init__(self, name, global_config=None):
