@@ -107,13 +107,21 @@ class TestCaseHandler:
             time.sleep(5)
         
             ## wait for emulator
+            timeout = 0
             while True:
                 print 'Waiting for emulator...'
-                cmd = '%(adb)s wait-for-device shell getprop init.svc.bootanim' % env
+                cmd = '%(adb)s shell getprop init.svc.bootanim' % env
                 proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 if 'stopped' in proc.stdout.read():
                     break
+                if timeout > 10:
+                    self.proc_emu.terminate()
+                    print 'Relaunch emulator'
+                    cmd = '%(emulator)s -avd %(os)s' % env
+                    self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    timeout = 0
                 time.sleep(5)
+                timeout += 1
                 
         ## setup env by adb shell
         print 'Setup environment'
@@ -159,7 +167,7 @@ class TestCaseHandler:
     
     def _trigger_test(self):
         err_count = 0
-        while(1):
+        while True:
             cmd = self.test_case.get_test_script()
             proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             ret = proc.communicate()
