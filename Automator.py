@@ -47,6 +47,7 @@ class Automator:
         else:
             print 'Scanning TestCase in \n %s' % os.getcwd()
             test_list = self._test_list(os.getcwd())
+            test_list.sort()
             print 'There are %d TestCases' % len(test_list)
             print '\n'
         
