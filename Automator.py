@@ -163,11 +163,11 @@ class TestCaseHandler:
             cmd = self.test_case.get_test_script()
             proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             ret = proc.communicate()
-            if ret[0] is None or err_count > 3:
+            if len(ret[0]) is 0 or err_count > 1:
                 break
             err_count += 1
             print 'Monkey Runner Error!!!'
-            print ret[0]
+            print len(ret[0])
     
     def _collect_result(self):
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()

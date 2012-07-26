@@ -24,7 +24,7 @@ settings_runComponent = settings_package + '/' + settings_activity
 device.startActivity(component=settings_runComponent)
 
 #Press Accept button of License Agreement
-MonkeyRunner.sleep(2)
+MonkeyRunner.sleep(5)
 device.touch(130,550,"DOWN_AND_UP") 
 
 #Press the Register button
