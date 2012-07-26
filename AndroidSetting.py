@@ -15,13 +15,14 @@ class AndroidSetting(object):
         self.options = ['battery', 'wifi', 'date', 'sms']
         
     def setup(self):
+        self._unlock_screen()
         for option in self.options:
             if option in self.config and self.config[option] != '':
                 method = getattr(self, '_' + option)
                 status = method(self.config[option])
     
     def _unlock_screen(self):
-        cmd = '%(adb)s shell input keyevent 82' % self.config
+        cmd = '%(adb)s wait-for-device shell input keyevent 82' % self.config
         proc = subprocess.Popen(cmd.split())
         return proc.wait()
     

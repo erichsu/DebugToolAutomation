@@ -26,7 +26,7 @@ now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 # Takes a screenshot
 result = device.takeSnapshot()
 # Writes the screenshot to a file
-result.writeToFile(r"d:\tmms\scripts\shot-" + now +r".png",'png')
+result.writeToFile(r"shot-" + now +r".png",'png')
 
 #Clean up UI
 device.press('KEYCODE_HOME', MonkeyDevice.DOWN_AND_UP)
@@ -38,7 +38,7 @@ device.drag(Start_point,End_point)
 MonkeyRunner.sleep(2)
 #Tap download link
 device.touch(220,330,"DOWN_AND_UP")
-MonkeyRunner.sleep(60)
+MonkeyRunner.sleep(20)
 
 device.drag(Start_point,End_point)
 MonkeyRunner.sleep(2)
@@ -50,7 +50,7 @@ device.touch(130,570,"DOWN_AND_UP")
 MonkeyRunner.sleep(3)
 #Click Install button
 device.touch(130,770,"DOWN_AND_UP")
-MonkeyRunner.sleep(60)
+MonkeyRunner.sleep(20)
 
 
 #Launch TMMS console

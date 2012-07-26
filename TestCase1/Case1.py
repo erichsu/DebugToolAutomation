@@ -24,7 +24,7 @@ settings_runComponent = settings_package + '/' + settings_activity
 device.startActivity(component=settings_runComponent)
 
 #Press Accept button of License Agreement
-MonkeyRunner.sleep(5)
+MonkeyRunner.sleep(2)
 device.touch(130,550,"DOWN_AND_UP") 
 
 #Press the Register button
@@ -51,13 +51,13 @@ device.touch(420,750,"DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 #Press Accept button of License Agreement
 device.touch(130,550,"DOWN_AND_UP") 
-MonkeyRunner.sleep(20)
-#Press Accept button of Device Administrator
-device.touch(150,550,"DOWN_AND_UP")
-MonkeyRunner.sleep(20) 
-#Press Activate button of Device Administrator
-device.touch(150,770,"DOWN_AND_UP")
-MonkeyRunner.sleep(2)
+MonkeyRunner.sleep(25)
+# #Press Accept button of Device Administrator
+# device.touch(150,550,"DOWN_AND_UP")
+# MonkeyRunner.sleep(10) 
+# #Press Activate button of Device Administrator
+# device.touch(150,770,"DOWN_AND_UP")
+# MonkeyRunner.sleep(2)
 now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 
@@ -68,7 +68,7 @@ result = device.takeSnapshot()
 result.writeToFile(r"shot-" + now +r".png",'png')
 
 #Remove TMMS package
-#device.removePackage(settings_package)
+# device.removePackage(settings_package)
 #MonkeyRunner.sleep(60)
 
 #Clean up UI

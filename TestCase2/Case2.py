@@ -19,7 +19,7 @@ settings_package = 'com.trendmicro.tmmssuite.consumer'
 settings_activity = 'com.trendmicro.tmmssuite.antimalware.ui.TmmsUpdateActivity'
 settings_runComponent = settings_package + '/' + settings_activity
 device.startActivity(component=settings_runComponent)
-MonkeyRunner.sleep(20)
+MonkeyRunner.sleep(8)
 
 #Open TMMS UI of Antimalware
 settings_activity = 'com.trendmicro.tmmssuite.antimalware.ui.AntimalwareTab'
