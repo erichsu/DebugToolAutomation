@@ -65,7 +65,8 @@ now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 result = device.takeSnapshot()
 
 # Writes the screenshot to a file
-result.writeToFile(r"shot-" + now +r".png",'png')
+# result.writeToFile(r"shot-" + now +r".png",'png')
+result.writeToFile(r"screenshot.png",'png')
 
 #Remove TMMS package
 # device.removePackage(settings_package)

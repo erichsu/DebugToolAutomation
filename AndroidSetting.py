@@ -29,9 +29,9 @@ class AndroidSetting(object):
     def _date(self, datetime=''):
         print 'Setup date time'
         cmd = '%(adb)s wait-for-device shell date -s %(date)s' % self.config
-        # proc = subprocess.Popen(cmd.split())
-        # proc.wait()
-        print cmd
+        proc = subprocess.Popen(cmd.split())
+        proc.wait()
+        # print cmd
     
     def _battery(self, volume='50'):
         print 'Setup battery'

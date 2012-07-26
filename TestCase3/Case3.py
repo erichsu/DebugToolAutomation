@@ -40,7 +40,8 @@ now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 result = device.takeSnapshot()
 
 # Writes the screenshot to a file
-result.writeToFile(r"shot-" + now +r".png",'png')
+# result.writeToFile(r"shot-" + now +r".png",'png')
+result.writeToFile(r"screenshot.png",'png')
 
 #Clean up UI
 device.press('KEYCODE_HOME', MonkeyDevice.DOWN_AND_UP)
