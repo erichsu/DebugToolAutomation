@@ -129,10 +129,11 @@ class TestCaseHandler:
         AndroidSetting(env).setup()
         
         ## install test apk
-        print 'Install test apk'
-        cmd = '%(adb)s wait-for-device install -r %(apk)s' % env
-        proc = subprocess.Popen(cmd.split(None, 4), cwd=self.test_case.path)
-        proc.wait()
+        if env.has_key('apk'):
+            print 'Install test apk'
+            cmd = '%(adb)s wait-for-device install -r %(apk)s' % env
+            proc = subprocess.Popen(cmd.split(None, 4), cwd=self.test_case.path)
+            proc.wait()
     
     def _start_debug_mode(self):
         """ Send STARTPUP_TASK intent to the debug service. """
