@@ -14,6 +14,11 @@
 function registerToggle(){
 	$('.tc').bind('click', function(){
 		$(this).parent().parent().find('div').slideToggle('slow');
+		if($(this).attr('src') == 'images/sub.jpg'){
+			$(this).attr('src', 'images/add.jpg');
+		}else{
+			$(this).attr('src', 'images/sub.jpg');
+		}
 	});
 	$('.togglepoint').hide();
 	$('.togglepoint').slideDown('fast');
@@ -32,7 +37,7 @@ $(document).ready(function() {
 		registerToggle();
 	});
 
-	$(".list a").click(function(){
+	$("a[id^=testcase]").click(function(){
 		$("#content").load($(this).attr('id')+".html", function(){
 			registerToggle();
 		});
