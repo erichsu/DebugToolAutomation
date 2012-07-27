@@ -13,7 +13,7 @@ class ReportMaker():
     def __init__(self):
         self.ispass = 'fail'
         
-        path = './report'
+        path = 'report'
         for f in os.listdir(path):
             if f.endswith('html'):
                 filepath = os.path.join(path, f)
