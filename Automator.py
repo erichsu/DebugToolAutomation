@@ -38,10 +38,11 @@ class Automator:
         config.read(os.path.join(os.getcwd(), self.global_config))
         global_config = dict(config.items('defaults'))
         
+        report_maker = ReportMaker()
         if self.testcase:
             name = self.testcase
             print '### %s ###' % name
-            tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator)
+            tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator, report_maker)
             tester.run()
             
         else:
@@ -54,9 +55,9 @@ class Automator:
             for test in test_list:
                 name = os.path.basename(test)
                 print '#### %s ####' % name
-                tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator)
+                tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator, report_maker)
                 tester.run()
-        tester.report_maker.finish()
+        report_maker.finish()
 
     def _test_list(self, path_root):
         """ list folders with the name heading of TESTCASE_PREFIX. """
@@ -65,10 +66,11 @@ class Automator:
                 if os.path.isdir(dir) and dir.startswith(self.testcase_prefix) ]
         
 class TestCaseHandler:
-    def __init__(self, test_case, use_emulator):
+    def __init__(self, test_case, use_emulator, report_maker):
         if isinstance(test_case, TestCase):
             self.use_emulator = use_emulator
             self.test_case = test_case
+            self.report_maker = report_maker
         else:
             raise TypeError
     
@@ -190,9 +192,7 @@ class TestCaseHandler:
         self.result = Verifier(self.test_case.config_path, self.test_case.name).verify()
         
     def _report(self):
-        report_maker = ReportMaker()
-        report_maker.export_result(self.test_case.name, self.result)
-        self.report_maker = report_maker
+        self.report_maker.export_result(self.test_case.name, self.result)
 
 class TestCase:
     def __init__(self, name, global_config=None):
