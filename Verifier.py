@@ -223,6 +223,7 @@ class LOGVerifier:
             parser_filter = ''
             log_path = os.path.join(os.getcwd(), self.testcase, log['path'])
             parser_values = []
+            parser_last_value = None
             for option in log['data']:
                 if option[0] == 'tag':
                     parser_tag = option[1]
@@ -263,7 +264,7 @@ class LOGVerifier:
                         result['result'].append(('value_' + str(i), parser_values[i], True))
                     else:
                         result['result'].append(('value_' + str(i), parser_values[i], content[1] + content[0]))
-                elif i == len(filter_contents) - 1:
+                elif i == len(filter_contents) - 1 and parser_last_value is not None:
                     find_content = re.search(parser_last_value, content[0], re.IGNORECASE)
                     if find_content:
                         # print 'found'
