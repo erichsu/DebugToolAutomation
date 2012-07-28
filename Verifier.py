@@ -19,14 +19,12 @@ from xml.etree.ElementTree import SubElement
 import commands
 
 class Verifier(object):
-    """docstring for Verifier"""
     def __init__(self, config_path=None, testcase=None):
         super(Verifier, self).__init__()
         self.config_path = config_path
         self.testcase = testcase
         
     def verify(self):
-        """docstring for verify"""
         report = []
         report += IniVerifier(self.config_path, self.testcase).verify()
         report += XmlVerifier(self.config_path, self.testcase).verify()
@@ -48,6 +46,11 @@ class IniVerifier:
             result['type'] = 'ini'
             print 'checking %s' % result['file']
             ini_path = os.path.join(os.getcwd(), self.testcase, ini['path'])
+            if not os.path.isfile(ini_path):
+                result['file'] += ' - file not found'
+                result['result'].append(('', '', 'File not found'))
+                report.append(result)
+                continue
             parser = ConfigParser.ConfigParser()
             parser.read(ini_path)
             for option in ini['data']:
@@ -93,6 +96,11 @@ class XmlVerifier:
             result['type'] = 'xml'
             print 'checking %s' % result['file']
             xml_path = os.path.join(os.getcwd(), self.testcase, xml['path'])
+            if not os.path.isfile(xml_path):
+                result['file'] += ' - file not found'
+                result['result'].append(('', '', 'File not found'))
+                report.append(result)
+                continue
             parser = ElementTree()
             tree = parser.parse(xml_path)
             itera =  tree.getiterator()
@@ -179,6 +187,11 @@ class DBVerifier:
             result['type'] = 'db'
             print 'checking %s' % result['file']
             db_path = os.path.join(os.getcwd(), self.testcase, db['path'])
+            if not os.path.isfile(db_path):
+                result['file'] += ' - file not found'
+                result['result'].append(('', '', 'File not found'))
+                report.append(result)
+                continue
             conn = sqlite3.connect(db_path)
             c = conn.cursor()
             db_table = ''
@@ -222,6 +235,11 @@ class LOGVerifier:
             parser_tag = ''
             parser_filter = ''
             log_path = os.path.join(os.getcwd(), self.testcase, log['path'])
+            if not os.path.isfile(log_path):
+                result['file'] += ' - file not found'
+                result['result'].append(('', '', 'File not found'))
+                report.append(result)
+                continue
             parser_values = []
             parser_last_value = None
             for option in log['data']:
@@ -233,7 +251,6 @@ class LOGVerifier:
                     result['file'] += '[filter:' + option[1] +']'
                 elif option[0] == 'value_last':
                     parser_last_value = option[1]
-                    # parser_values.append(option[1])
                 elif 'value' in option[0]:
                     parser_values.insert(int(option[0][6:]), option[1])
             # print parser_values

@@ -66,7 +66,7 @@
 		<td><xsl:value-of select="value"/></td>
 		<td>
 		<xsl:choose>
-		<xsl:when test="status != 0"><img alt="succ" src="images/succ.jpg"/><xsl:value-of select="status"/></xsl:when>
+		<xsl:when test="status > 0"><img alt="succ" src="images/succ.jpg"/><xsl:value-of select="status"/></xsl:when>
 		<xsl:otherwise><img alt="fail" src="images/fail.jpg"/><xsl:value-of select="status"/></xsl:otherwise>
 		</xsl:choose>
 		</td>

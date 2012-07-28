@@ -99,7 +99,6 @@ class TestCaseHandler:
         print '\n'
         
     def _setup_environment(self):
-        """ TODO: call the related tool to change the emulator env. """
         env = self.test_case.get_env()
         
         if self.use_emulator:
@@ -149,7 +148,6 @@ class TestCaseHandler:
         proc = subprocess.Popen(cmd.split())
         proc.wait()
         
-        """ TODO: make sure service is stopped fully, here use dumpsys command to check infinitely. """
         max_retry_count = 10
         retry_count = 0
         while True:
@@ -160,13 +158,12 @@ class TestCaseHandler:
             #print prepro[0]
             retry_count+=1
             if prepro[0].find('BackendService')>0:
-                print 'continue, since backend still alived'
+                print 'Wait, since Support tool still alived'
             
             if retry_count >= max_retry_count:
-                print 'it is time to go'
+                print 'Waiting timeout, keep going...'
                 break
             time.sleep(5)
-        print 'end...'
         
     
     def _trigger_test(self):
@@ -178,8 +175,8 @@ class TestCaseHandler:
             if len(ret[0]) is 0 or err_count > 1:
                 break
             err_count += 1
-            print 'Monkey Runner Error!!!'
-            print len(ret[0])
+            print 'Monkey Runner unknown error, retrying...'
+            # print len(ret[0])
     
     def _collect_result(self):
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
