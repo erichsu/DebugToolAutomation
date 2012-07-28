@@ -38,6 +38,11 @@ class Automator:
         config.read(os.path.join(os.getcwd(), self.global_config))
         global_config = dict(config.items('defaults'))
         
+        # Check Android SDK
+        if not os.path.exists(global_config['android_sdk']):
+            print 'Android SDK not found'
+            raise EnvironmentError
+        
         report_maker = ReportMaker()
         if self.testcase:
             name = self.testcase
