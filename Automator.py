@@ -15,6 +15,7 @@ import os
 import subprocess
 import time
 import ConfigParser
+import re
 
 from AndroidSetting import AndroidSetting
 from Verifier import Verifier
@@ -108,14 +109,21 @@ class TestCaseHandler:
         
         if self.device is None:
             ## check existing emulator
+            avd_list = [ re.search('Name: (?P<avd_name>.*)', buf).group('avd_name') 
+                         for buf in subprocess.check_output(('%(android)s list avd' % env).split()).split('\n')
+                         if re.search('Name: (?P<avd_name>.*)', buf) ]
+            # print avd_list
             cmd = '%(adb)s devices' % env
-            if 'emulator-5554' in subprocess.check_output(cmd.split()).split():
-                print 'Fetal Error: there is already emulator-5554, please select another emulator port for Automator'
-                print 'Maybe you could just select this emulator by "python Automator.py -s emulator-5554"'
+            if 'emulator-%(avd_port)s' % env in subprocess.check_output(cmd.split()).split():
+                print 'Fetal Error: there is already emulator-%(avd_port)s, please select another emulator port for Automator' % env
+                print 'Maybe you could just select this emulator by "python Automator.py -s emulator-%(avd_port)s"' % env
+                raise EnvironmentError
+            elif not '%(avd)s' % env in avd_list:
+                print 'Fetal Error: No AVD "%(avd)s" found' % env
                 raise EnvironmentError
             ## launch emulator
             print 'Launch emulator'
-            cmd = '%(emulator)s -avd %(os)s -port 5554' % env
+            cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % env
             self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             time.sleep(5)
         
@@ -130,7 +138,7 @@ class TestCaseHandler:
                 if timeout > 10:
                     self.proc_emu.terminate()
                     print 'Relaunch emulator'
-                    cmd = '%(emulator)s -avd %(os)s -port 5554' % env
+                    cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % env
                     self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     timeout = 0
                 time.sleep(5)
@@ -201,7 +209,7 @@ class TestCaseHandler:
         cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
         proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
         proc.wait()
-        if self.use_emulator:
+        if self.device is None:
             self.proc_emu.terminate()
         
     def _verify(self):
