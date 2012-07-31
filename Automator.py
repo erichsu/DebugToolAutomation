@@ -28,10 +28,10 @@ class Automator:
         1. scan the test folders
         2. pass the folders one by one to the TestHandler
         """
-        print 'Initilizing...'
-        print 'USE_EMULATOR = %s' % self.use_emulator
+        print 'Initilizing...'        
         print 'GLOBAL_CONFIG = %s' % self.global_config
         print 'TESTCASE_PREFIX = %s' % self.testcase_prefix
+        print 'DEVICE = %s' % self.device if self.device is not None else 'No device selected, using Virtual Deivce by config'
         print '\n'
         
         config = ConfigParser.ConfigParser()
@@ -47,7 +47,7 @@ class Automator:
         if self.testcase:
             name = self.testcase
             print '### %s ###' % name
-            tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator, report_maker)
+            tester = TestCaseHandler(TestCase(name, global_config), self.device, report_maker)
             tester.run()
             
         else:
@@ -60,7 +60,7 @@ class Automator:
             for test in test_list:
                 name = os.path.basename(test)
                 print '#### %s ####' % name
-                tester = TestCaseHandler(TestCase(name, global_config), self.use_emulator, report_maker)
+                tester = TestCaseHandler(TestCase(name, global_config), self.device, report_maker)
                 tester.run()
         report_maker.finish()
 
@@ -71,9 +71,9 @@ class Automator:
                 if os.path.isdir(dir) and dir.startswith(self.testcase_prefix) ]
         
 class TestCaseHandler:
-    def __init__(self, test_case, use_emulator, report_maker):
+    def __init__(self, test_case, device, report_maker):
         if isinstance(test_case, TestCase):
-            self.use_emulator = use_emulator
+            self.device = device
             self.test_case = test_case
             self.report_maker = report_maker
         else:
@@ -106,10 +106,16 @@ class TestCaseHandler:
     def _setup_environment(self):
         env = self.test_case.get_env()
         
-        if self.use_emulator:
+        if self.device is None:
+            ## check existing emulator
+            cmd = '%(adb)s devices' % env
+            if 'emulator-5554' in subprocess.check_output(cmd.split()).split():
+                print 'Fetal Error: there is already emulator-5554, please select another emulator port for Automator'
+                print 'Maybe you could just select this emulator by "python Automator.py -s emulator-5554"'
+                raise EnvironmentError
             ## launch emulator
             print 'Launch emulator'
-            cmd = '%(emulator)s -avd %(os)s' % env
+            cmd = '%(emulator)s -avd %(os)s -port 5554' % env
             self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             time.sleep(5)
         
@@ -124,12 +130,20 @@ class TestCaseHandler:
                 if timeout > 10:
                     self.proc_emu.terminate()
                     print 'Relaunch emulator'
-                    cmd = '%(emulator)s -avd %(os)s' % env
+                    cmd = '%(emulator)s -avd %(os)s -port 5554' % env
                     self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     timeout = 0
                 time.sleep(5)
                 timeout += 1
-                
+        else:
+            cmd = '%(adb)s devices' % env
+            if not self.device in subprocess.check_output(cmd.split()).split():
+                print 'Fetal Error: there is no %s, please select another emulator port for Automator' % self.device
+                raise EnvironmentError
+            # use selected device by serial number.
+            env['adb'] += ' -s %s' % self.device
+            # print env['adb']
+            
         ## setup env by adb shell
         print 'Setup environment'
         AndroidSetting(env).setup()
@@ -138,7 +152,7 @@ class TestCaseHandler:
         if env.has_key('apk'):
             print 'Install test apk'
             cmd = '%(adb)s wait-for-device install -r %(apk)s' % env
-            proc = subprocess.Popen(cmd.split(None, 4), cwd=self.test_case.path)
+            proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
             proc.wait()
     
     def _start_debug_mode(self):
@@ -215,8 +229,8 @@ def main():
     parser = argparse.ArgumentParser(description='Autmation script for Android App testing.')
     parser.add_argument('-v', '--version', action='version', version='Automator 1.0',
                         help='show the version info')
-    parser.add_argument('-e', '--emulator', action='store_true', dest='use_emulator', default=False, 
-                        help='assign specific test case')
+    parser.add_argument('-s', action='store', dest='device', 
+                        help='connect to device by serial number, please use "adb devices" to check the device')
     parser.add_argument('-r', '--run', action='store', dest='testcase', 
                         help='assign specific test case')
     parser.add_argument('-c', '--config', action='store', dest='global_config', default='config.ini', 
