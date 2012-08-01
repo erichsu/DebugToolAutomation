@@ -13,7 +13,7 @@ device = MonkeyRunner.waitForConnection()
 #Open Longevity main UI
 settings_package = 'com.trendmicro.mobileutilities.optimizer'
 #settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.OptimizerMainEntry'
-settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.WelcomePageActivity'
+settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.entry.Entry'
 settings_runComponent = settings_package + '/' + settings_activity
 device.startActivity(component=settings_runComponent)
 MonkeyRunner.sleep(5)
