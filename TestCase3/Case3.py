@@ -1,5 +1,5 @@
 #Case 3
-#Change date and verfiy program version 
+#Change date and verify program version 
 
 import time
 import datetime

@@ -28,8 +28,8 @@ class Verifier(object):
         report = []
         report += IniVerifier(self.config_path, self.testcase).verify()
         report += XmlVerifier(self.config_path, self.testcase).verify()
-        report += DBVerifier(self.config_path, self.testcase).verify()
-        report += LOGVerifier(self.config_path, self.testcase).verify()
+        report += DbVerifier(self.config_path, self.testcase).verify()
+        report += LogVerifier(self.config_path, self.testcase).verify()
         return report
 
 class IniVerifier:
@@ -73,7 +73,7 @@ class IniVerifier:
                     
                 result['result'].append((option[0], option[1], is_pass))
             report.append(result)
-            print report
+            # print report
         return report
     
     def _expected_data(self):
@@ -173,7 +173,7 @@ class XmlVerifier:
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.xml') ]
 
-class DBVerifier:
+class DbVerifier:
     def __init__(self, config_path=None, testcase=None):
         self.config_path = config_path
         self.testcase = testcase
@@ -218,7 +218,7 @@ class DBVerifier:
         parser.read(self.config_path)
         return [ {'path':section, 'data':parser.items(section)} for section in parser.sections() if section.endswith('.db') ]
 
-class LOGVerifier:
+class LogVerifier:
     def __init__(self, config_path=None, testcase=None):
         self.config_path = config_path
         self.testcase = testcase

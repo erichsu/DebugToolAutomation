@@ -81,6 +81,8 @@ class TestCaseHandler:
             raise TypeError
     
     def run(self):
+        print self.test_case.description()
+        
         print '@Setup the environment for testing.'
         self._setup_environment()
         
@@ -231,6 +233,9 @@ class TestCase:
     
     def get_test_script(self):
         return self.config.get('test script', 'command')
+        
+    def description(self):
+        return self.config.get('test script', 'description')
 
 def main():
     automator = Automator()
