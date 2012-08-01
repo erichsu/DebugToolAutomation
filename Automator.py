@@ -130,6 +130,7 @@ class TestCaseHandler:
             time.sleep(5)
         
             ## wait for emulator
+            max_retry = 10
             timeout = 0
             while True:
                 print 'Waiting for emulator...'
@@ -137,12 +138,13 @@ class TestCaseHandler:
                 proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 if 'stopped' in proc.stdout.read():
                     break
-                if timeout > 10:
+                if timeout > max_retry:
                     self.proc_emu.terminate()
                     print 'Relaunch emulator'
                     cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % env
                     self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     timeout = 0
+                    max_retry += 1
                 time.sleep(5)
                 timeout += 1
         else:
