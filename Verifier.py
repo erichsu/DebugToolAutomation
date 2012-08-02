@@ -32,6 +32,16 @@ class Verifier(object):
         report += LogVerifier(self.config_path, self.testcase).verify()
         return report
 
+class FakeSecHead(object):
+    def __init__(self, fp):
+        self.fp = fp
+        self.sechead = '[asection]\n'
+    def readline(self):
+        if self.sechead:
+            try: return self.sechead
+            finally: self.sechead = None
+        else: return self.fp.readline()
+
 class IniVerifier:
     def __init__(self, config_path=None, testcase=None):
         self.config_path = config_path
@@ -52,7 +62,7 @@ class IniVerifier:
                 report.append(result)
                 continue
             parser = ConfigParser.ConfigParser()
-            parser.read(ini_path)
+            parser.readfp(FakeSecHead(open(ini_path)))
             for option in ini['data']:
                 # print option
                 has_option = False
@@ -312,5 +322,5 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    sys.argv += '-c TestCase0/config.ini -r TestCase0'.split()
+    sys.argv += '-c TestCase1/config.ini -r TestCase1'.split()
     sys.exit(main())
