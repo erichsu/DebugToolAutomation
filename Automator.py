@@ -203,7 +203,10 @@ class TestCaseHandler:
             cmd = self.test_case.get_test_script()
             proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             ret = proc.communicate()
-            if len(ret[0]) is 0 or err_count > 1:
+            if len(ret[0]) is 0:
+                break
+            elif err_count > 3:
+                print 'Error too many times...pass this test.'
                 break
             err_count += 1
             print 'Monkey Runner unknown error, retrying...'
