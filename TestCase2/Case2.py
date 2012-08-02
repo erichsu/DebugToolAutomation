@@ -37,7 +37,7 @@ device.touch(250,180,"DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 
 
-now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+# now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 
 # Takes a screenshot
@@ -48,4 +48,6 @@ result = device.takeSnapshot()
 result.writeToFile(r"screenshot.png",'png')
 
 #Clean up UI
-device.press('KEYCODE_HOME', MonkeyDevice.DOWN_AND_UP)
+for x in range(10):
+    device.press('KEYCODE_BACK', MonkeyDevice.DOWN_AND_UP)
+    MonkeyRunner.sleep(1)

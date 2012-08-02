@@ -21,44 +21,61 @@ settings_package = 'com.trendmicro.tmmssuite.consumer'
 settings_activity = 'com.trendmicro.tmmssuite.consumer.login.ui.Login'
 settings_runComponent = settings_package + '/' + settings_activity
 
+device.press("KEYCODE_BACK","DOWN_AND_UP")
 device.startActivity(component=settings_runComponent)
-
-#Press Accept button of License Agreement
 MonkeyRunner.sleep(5)
-device.touch(130,550,"DOWN_AND_UP") 
 
 #Press the Register button
-MonkeyRunner.sleep(2)
 device.touch(242,750,"DOWN_AND_UP") 
 MonkeyRunner.sleep(2)
 #Press username input box 
 device.touch(240,430,"DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 #Input username
-device.type(r"shujen_sun@trend.com.tw")
-MonkeyRunner.sleep(2)
-#Press Done key 
-device.touch(420,750,"DOWN_AND_UP") 
-MonkeyRunner.sleep(2)
-#Press password input box 
-device.touch(240,430,"DOWN_AND_UP")
+device.type(r"shujen_sun@trend.com.tw") 
+device.press("KEYCODE_ENTER","DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 #Input password
 device.type(r"osce1234")
-MonkeyRunner.sleep(2)
-#Press Done key 
-device.touch(420,750,"DOWN_AND_UP") 
+device.press("KEYCODE_ENTER","DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 #Press Accept button of License Agreement
 device.touch(130,550,"DOWN_AND_UP") 
+MonkeyRunner.sleep(20)
+
+#Setup google account
+device.touch(200,540,"DOWN_AND_UP")
+MonkeyRunner.sleep(2)
+device.touch(200,220,"DOWN_AND_UP")
+MonkeyRunner.sleep(2)
+device.touch(300,750,"DOWN_AND_UP")
+MonkeyRunner.sleep(5)
+device.touch(100,320,"DOWN_AND_UP")
+MonkeyRunner.sleep(2)
+device.type(r"erichsu.test")
+device.press('KEYCODE_ENTER', 'DOWN_AND_UP')
+device.type(r"trendtest")
+device.touch(300,750,"DOWN_AND_UP")
+MonkeyRunner.sleep(5)
+device.touch(300,750,"DOWN_AND_UP")
 MonkeyRunner.sleep(25)
-# #Press Accept button of Device Administrator
-# device.touch(150,550,"DOWN_AND_UP")
-# MonkeyRunner.sleep(10) 
-# #Press Activate button of Device Administrator
-# device.touch(150,770,"DOWN_AND_UP")
-# MonkeyRunner.sleep(2)
-now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+
+device.press('KEYCODE_DPAD_LEFT', 'DOWN_AND_UP')
+device.press('KEYCODE_ENTER', 'DOWN_AND_UP')
+MonkeyRunner.sleep(10)
+device.press('KEYCODE_DPAD_LEFT', 'DOWN_AND_UP')
+device.press('KEYCODE_ENTER', 'DOWN_AND_UP')
+MonkeyRunner.sleep(2)
+
+device.startActivity(component=settings_runComponent)
+MonkeyRunner.sleep(10)
+#Press Accept button of Device Administrator
+device.touch(150,550,"DOWN_AND_UP")
+MonkeyRunner.sleep(2)
+# Press Activate button of Device Administrator
+device.touch(150,770,"DOWN_AND_UP")
+MonkeyRunner.sleep(2)
+# # now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 
 
 # Takes a screenshot

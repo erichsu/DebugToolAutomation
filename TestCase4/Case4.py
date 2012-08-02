@@ -16,17 +16,18 @@ settings_package = 'com.trendmicro.tmmssuite.consumer'
 settings_activity = 'com.trendmicro.tmmssuite.consumer.login.ui.Login'
 settings_runComponent = settings_package + '/' + settings_activity
 device.startActivity(component=settings_runComponent)
+MonkeyRunner.sleep(2)
 # Press the Menu button
 device.press('KEYCODE_MENU', MonkeyDevice.DOWN_AND_UP)
 MonkeyRunner.sleep(2)
 #Press About button
 device.touch(400,660,"DOWN_AND_UP")
 MonkeyRunner.sleep(2)
-now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+# now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 # Takes a screenshot
-result = device.takeSnapshot()
+# result = device.takeSnapshot()
 # Writes the screenshot to a file
-result.writeToFile(r"shot-" + now +r".png",'png')
+# result.writeToFile(r"shot-" + now +r".png",'png')
 
 #Clean up UI
 device.press('KEYCODE_HOME', MonkeyDevice.DOWN_AND_UP)
@@ -64,7 +65,7 @@ MonkeyRunner.sleep(2)
 #Press About button
 device.touch(400,660,"DOWN_AND_UP")
 MonkeyRunner.sleep(3)
-now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
+# now=strftime("%Y-%m-%d-%H-%M-%S", gmtime())
 # Takes a screenshot
 result = device.takeSnapshot()
 # Writes the screenshot to a file
