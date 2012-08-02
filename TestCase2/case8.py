@@ -12,21 +12,19 @@ from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 device = MonkeyRunner.waitForConnection()
 #Open Longevity main UI
 settings_package = 'com.trendmicro.mobileutilities.optimizer'
-#settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.OptimizerMainEntry'
-settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.entry.Entry'
+settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.OptimizerMainEntry'
+# settings_activity = 'com.trendmicro.mobileutilities.optimizer.ui.entry.Entry'
 settings_runComponent = settings_package + '/' + settings_activity
 
-print "Start Activity"
-print settings_runComponent
+# print "Start Activity"
+# print settings_runComponent
 device.startActivity(component=settings_runComponent)
-MonkeyRunner.sleep(5)
+MonkeyRunner.sleep(3)
 
 #Press Optimize button
 device.touch(200,530,"DOWN_AND_UP")
 
-for x in range(15):
-    MonkeyRunner.sleep(1)
-    print ".",
+MonkeyRunner.sleep(15)
     
 #Press continue button
 device.touch(230,750,"DOWN_AND_UP")
@@ -38,4 +36,4 @@ MonkeyRunner.sleep(3)
 result = device.takeSnapshot()
 # Writes the screenshot to a file
 result.writeToFile(r"screenshot.png",'png')
-print "Sucess!"
+device.press("KEYCODE_HOME","DOWN_AND_UP")
