@@ -21,7 +21,7 @@ MonkeyRunner.sleep(8)
 
 #Close tutorial
 device.touch(380,170,"DOWN_AND_UP")
-MonkeyRunner.sleep(2)
+MonkeyRunner.sleep(5)
 device.touch(300,560,"DOWN_AND_UP")
 MonkeyRunner.sleep(2)
 

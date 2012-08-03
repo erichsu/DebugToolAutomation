@@ -36,4 +36,3 @@ MonkeyRunner.sleep(3)
 result = device.takeSnapshot()
 # Writes the screenshot to a file
 result.writeToFile(r"screenshot.png",'png')
-device.press("KEYCODE_HOME","DOWN_AND_UP")
