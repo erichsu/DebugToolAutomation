@@ -258,4 +258,7 @@ def main():
     return 0
 
 if __name__ == "__main__":
+    # sys.argv += '-s 0149905B1900F009 -r TestCase2'.split()
+    sys.argv += '-s emulator-5554 -r TestCase2'.split()
+    # sys.argv += '-r TestCase2'.split()
     sys.exit(main())
