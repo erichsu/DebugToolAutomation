@@ -77,6 +77,7 @@ class TestCaseHandler:
             self.device = device
             self.test_case = test_case
             self.report_maker = report_maker
+            self.env = self.test_case.get_env()
         else:
             raise TypeError
     
@@ -107,25 +108,23 @@ class TestCaseHandler:
         print '\n'
         
     def _setup_environment(self):
-        env = self.test_case.get_env()
-        
         if self.device is None:
             ## check existing emulator
             avd_list = [ re.search('Name: (?P<avd_name>.*)', buf).group('avd_name') 
-                         for buf in subprocess.check_output(('%(android)s list avd' % env).split()).split('\n')
+                         for buf in subprocess.check_output(('%(android)s list avd' % self.env).split()).split('\n')
                          if re.search('Name: (?P<avd_name>.*)', buf) ]
             # print avd_list
-            cmd = '%(adb)s devices' % env
-            if 'emulator-%(avd_port)s' % env in subprocess.check_output(cmd.split()).split():
-                print 'Fetal Error: there is already emulator-%(avd_port)s, please select another emulator port for Automator' % env
-                print 'Maybe you could just select this emulator by "python Automator.py -s emulator-%(avd_port)s"' % env
+            cmd = '%(adb)s devices' % self.env
+            if 'emulator-%(avd_port)s' % self.env in subprocess.check_output(cmd.split()).split():
+                print 'Fetal Error: there is already emulator-%(avd_port)s, please select another emulator port for Automator' % self.env
+                print 'Maybe you could just select this emulator by "python Automator.py -s emulator-%(avd_port)s"' % self.env
                 raise EnvironmentError
-            elif not '%(avd)s' % env in avd_list:
-                print 'Fetal Error: No AVD "%(avd)s" found' % env
+            elif not '%(avd)s' % self.env in avd_list:
+                print 'Fetal Error: No AVD "%(avd)s" found' % self.env
                 raise EnvironmentError
             ## launch emulator
             print 'Launch emulator'
-            cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % env
+            cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % self.env
             self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             time.sleep(5)
         
@@ -134,55 +133,53 @@ class TestCaseHandler:
             timeout = 0
             while True:
                 print 'Waiting for emulator...'
-                cmd = '%(adb)s shell getprop init.svc.bootanim' % env
+                cmd = '%(adb)s shell getprop init.svc.bootanim' % self.env
                 proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 if 'stopped' in proc.stdout.read():
                     break
                 if timeout > max_retry:
                     self.proc_emu.terminate()
                     print 'Relaunch emulator'
-                    cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % env
+                    cmd = '%(emulator)s -avd %(avd)s -port %(avd_port)s' % self.env
                     self.proc_emu = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                     timeout = 0
                     max_retry += 1
                 time.sleep(5)
                 timeout += 1
         else:
-            cmd = '%(adb)s devices' % env
+            cmd = '%(adb)s devices' % self.env
             if not self.device in subprocess.check_output(cmd.split()).split():
                 print 'Fetal Error: there is no %s, please select another emulator port for Automator' % self.device
                 raise EnvironmentError
             # use selected device by serial number.
-            env['adb'] += ' -s %s' % self.device
-            # print env['adb']
             
         ## setup env by adb shell
         print 'Setup environment'
-        AndroidSetting(env).setup()
+        AndroidSetting(self.env).setup()
         
         ## install test apk
-        if env.has_key('apk'):
+        if self.env.has_key('apk'):
             print 'Install test apk'
-            cmd = '%(adb)s wait-for-device install -r %(apk)s' % env
+            cmd = '%(adb)s wait-for-device install -r %(apk)s' % self.env
             proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
             proc.wait()
     
     def _start_debug_mode(self):
         """ Send STARTPUP_TASK intent to the debug service. """
-        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a %(intent_start)s' % self.test_case.get_env()
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a %(intent_start)s' % self.env
         proc = subprocess.Popen(cmd.split())
         proc.wait()
     
     def _stop_debug_mode(self):
         """ Send STOP_TASK intent to the debug service. """
-        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a %(intent_stop)s' % self.test_case.get_env()
+        cmd = '%(adb)s wait-for-device shell am startservice -n %(package)s/%(service)s -a %(intent_stop)s' % self.env
         proc = subprocess.Popen(cmd.split())
         proc.wait()
         
         max_retry_count = 10
         retry_count = 0
         while True:
-            cmd = '%(adb)s shell dumpsys activity service com.trendmicro.tmmssuite.consumer' % self.test_case.get_env()
+            cmd = '%(adb)s shell dumpsys activity service com.trendmicro.tmmssuite.consumer' % self.env
             proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
             prepro = proc.communicate();
             proc.wait()
@@ -213,7 +210,7 @@ class TestCaseHandler:
             # print len(ret[0])
     
     def _collect_result(self):
-        cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.test_case.get_env()
+        cmd = '%(adb)s wait-for-device pull %(log_path)s output' % self.env
         proc = subprocess.Popen(cmd.split(), cwd=self.test_case.path)
         proc.wait()
         if self.device is None:
