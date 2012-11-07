@@ -152,6 +152,7 @@ class TestCaseHandler:
                 print 'Fetal Error: there is no %s, please select another emulator port for Automator' % self.device
                 raise EnvironmentError
             # use selected device by serial number.
+            self.env['adb'] += ' -s ' + self.device
             
         ## setup env by adb shell
         print 'Setup environment'
